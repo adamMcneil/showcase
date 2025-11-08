@@ -24,8 +24,8 @@ function main() {
     if (files.length === 0) continue
     // sort to get a deterministic order
     files.sort()
-    // create posix paths for browser consumption
-    const filesPosix = files.map(f => path.posix.join('/images', d.name, f))
+    // create posix paths for browser consumption, include /showcase prefix for GitHub Pages
+    const filesPosix = files.map(f => path.posix.join('/showcase/images', d.name, f))
     const first = filesPosix[0]
     result.push({ dir: d.name, first, files: filesPosix })
   }
