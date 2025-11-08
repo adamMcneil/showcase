@@ -20,12 +20,14 @@ function main() {
   const result = []
   for (const d of dirs) {
     const dirPath = path.join(imagesDir, d.name)
-    const files = fs.readdirSync(dirPath).filter(isImage)
+    let files = fs.readdirSync(dirPath).filter(isImage)
     if (files.length === 0) continue
-    // sort to get a deterministic first image
+    // sort to get a deterministic order
     files.sort()
-    const first = path.posix.join('/images', d.name, files[0])
-    result.push({ dir: d.name, first })
+    // create posix paths for browser consumption
+    const filesPosix = files.map(f => path.posix.join('/images', d.name, f))
+    const first = filesPosix[0]
+    result.push({ dir: d.name, first, files: filesPosix })
   }
 
   // sort result by dir name for consistency

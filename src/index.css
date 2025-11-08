@@ -14,3 +14,20 @@ h1{margin:0 0 6px}
 .thumb img{width:100%;height:100%;object-fit:cover}
 .title{padding:10px 12px;font-weight:600}
 .link{color:inherit}
+
+/* Modal styles */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:90}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.5)}
+.modal-content{position:relative;background:var(--card);border-radius:8px;padding:12px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:12px;z-index:91}
+.modal-header{display:flex;align-items:center;justify-content:space-between}
+.modal-body{display:flex;align-items:center;gap:8px}
+.modal-image{width:70vw;height:60vh;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px}
+.modal-image img{width:100%;height:100%;object-fit:contain}
+.nav{background:transparent;border:none;color:#fff;font-size:22px;padding:8px;cursor:pointer}
+.nav.left{margin-right:6px}
+.nav.right{margin-left:6px}
+.thumb-row{display:flex;gap:8px;overflow:auto;padding-bottom:6px}
+.thumb-item{border:2px solid transparent;padding:2px;border-radius:4px;background:transparent}
+.thumb-item img{height:60px;width:80px;object-fit:cover;display:block}
+.thumb-item.active{border-color:#333}
+.close{background:transparent;border:none;font-size:20px;cursor:pointer}
