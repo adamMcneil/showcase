@@ -33,7 +33,8 @@ jobs:
           mkdir -p dist && touch dist/.nojekyll
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1
+        # Use v2 to avoid older internal dependency on actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v2
         with:
           path: 'dist/'
 
