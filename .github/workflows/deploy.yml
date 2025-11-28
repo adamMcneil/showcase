@@ -39,7 +39,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "dist/gh-pages-workflow/browser/"
+          path: "dist/"
 
   # Deployment job
   deploy:
