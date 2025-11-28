@@ -34,7 +34,7 @@ jobs:
         run: npm install
   
       - name: Build Angular app
-        run: npm run build -- --base-href /gh-pages-workflow/
+        run: npm run build && ls
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
