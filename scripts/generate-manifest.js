@@ -26,7 +26,9 @@ function main() {
     files.sort()
     // create relative paths that will work with copied images directory
     const filesPosix = files.map(f => path.posix.join('./images', d.name, f))
-    const first = filesPosix[filesPosix.length - 1]
+    // check if "first.jpg" exists, otherwise use the first file
+    const firstJpgIndex = files.findIndex(f => f.toLowerCase() === 'first.jpg')
+    const first = firstJpgIndex !== -1 ? filesPosix[firstJpgIndex] : filesPosix[0]
     result.push({ dir: d.name, first, files: filesPosix })
   }
 

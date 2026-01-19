@@ -8,7 +8,7 @@
   },
   {
     "dir": "austin-wedding-sign",
-    "first": "images/austin-wedding-sign/IMG_20251101_125541418.jpg",
+    "first": "images/austin-wedding-sign/IMG_20251025_080434189_HDR.jpg",
     "files": [
       "images/austin-wedding-sign/IMG_20251025_080434189_HDR.jpg",
       "images/austin-wedding-sign/IMG_20251025_080438998_HDR.jpg",
@@ -17,26 +17,33 @@
   },
   {
     "dir": "basket-stand",
-    "first": "images/basket-stand/1.jpg",
+    "first": "images/basket-stand/0.jpg",
     "files": [
       "images/basket-stand/0.jpg",
       "images/basket-stand/1.jpg"
     ]
   },
   {
+    "dir": "bens-knife",
+    "first": "images/bens-knife/PXL_20260119_230948359.jpg",
+    "files": [
+      "images/bens-knife/PXL_20260119_230948359.jpg"
+    ]
+  },
+  {
     "dir": "bens-table",
-    "first": "images/bens-table/IMG_20250619_194508016.jpg",
+    "first": "images/bens-table/first.jpg",
     "files": [
       "images/bens-table/0.jpg",
-      "images/bens-table/IMG_20250619_194436745.jpg",
       "images/bens-table/IMG_20250619_194454063.jpg",
       "images/bens-table/IMG_20250619_194504317.jpg",
-      "images/bens-table/IMG_20250619_194508016.jpg"
+      "images/bens-table/IMG_20250619_194508016.jpg",
+      "images/bens-table/first.jpg"
     ]
   },
   {
     "dir": "box",
-    "first": "images/box/IMG_20251017_180707279.jpg",
+    "first": "images/box/IMG_20251017_180553693.jpg",
     "files": [
       "images/box/IMG_20251017_180553693.jpg",
       "images/box/IMG_20251017_180559683.jpg",
@@ -48,9 +55,8 @@
   },
   {
     "dir": "catan",
-    "first": "images/catan/old.jpg",
+    "first": "images/catan/first.jpg",
     "files": [
-      "images/catan/0.jpg",
       "images/catan/1.jpg",
       "images/catan/IMG_20250613_154442483.jpg",
       "images/catan/IMG_20250614_120601545.jpg",
@@ -84,12 +90,13 @@
       "images/catan/IMG_20250702_093935632.jpg",
       "images/catan/IMG_20250702_093935757.jpg",
       "images/catan/IMG_20250702_093937202.jpg",
+      "images/catan/first.jpg",
       "images/catan/old.jpg"
     ]
   },
   {
     "dir": "cherry-bench",
-    "first": "images/cherry-bench/1.jpg",
+    "first": "images/cherry-bench/0.jpg",
     "files": [
       "images/cherry-bench/0.jpg",
       "images/cherry-bench/1.jpg"
@@ -97,19 +104,19 @@
   },
   {
     "dir": "chess-board",
-    "first": "images/chess-board/IMG_20250906_085751905.jpg",
+    "first": "images/chess-board/first.jpg",
     "files": [
-      "images/chess-board/IMG_20250905_205038098.jpg",
       "images/chess-board/IMG_20250905_205047232.jpg",
       "images/chess-board/IMG_20250906_082434518.jpg",
       "images/chess-board/IMG_20250906_082440275.jpg",
       "images/chess-board/IMG_20250906_082731066.jpg",
-      "images/chess-board/IMG_20250906_085751905.jpg"
+      "images/chess-board/IMG_20250906_085751905.jpg",
+      "images/chess-board/first.jpg"
     ]
   },
   {
     "dir": "davids-bookshelf",
-    "first": "images/davids-bookshelf/IMG_20250913_193947233.jpg",
+    "first": "images/davids-bookshelf/IMG_20250913_193934862.jpg",
     "files": [
       "images/davids-bookshelf/IMG_20250913_193934862.jpg",
       "images/davids-bookshelf/IMG_20250913_193947233.jpg"
@@ -117,15 +124,15 @@
   },
   {
     "dir": "davids-workbench",
-    "first": "images/davids-workbench/IMG_20251018_122457259.jpg",
+    "first": "images/davids-workbench/first.jpg",
     "files": [
-      "images/davids-workbench/IMG_20251018_122451184.jpg",
-      "images/davids-workbench/IMG_20251018_122457259.jpg"
+      "images/davids-workbench/IMG_20251018_122457259.jpg",
+      "images/davids-workbench/first.jpg"
     ]
   },
   {
     "dir": "end-table",
-    "first": "images/end-table/1.jpg",
+    "first": "images/end-table/0.jpg",
     "files": [
       "images/end-table/0.jpg",
       "images/end-table/1.jpg"
@@ -133,7 +140,7 @@
   },
   {
     "dir": "first-box",
-    "first": "images/first-box/2.jpg",
+    "first": "images/first-box/0.jpg",
     "files": [
       "images/first-box/0.jpg",
       "images/first-box/1.jpg",
@@ -142,7 +149,7 @@
   },
   {
     "dir": "first-cajon",
-    "first": "images/first-cajon/IMG_20250616_130848721_HDR.jpg",
+    "first": "images/first-cajon/0.jpg",
     "files": [
       "images/first-cajon/0.jpg",
       "images/first-cajon/IMG_20250616_130829010_HDR.jpg",
@@ -160,7 +167,7 @@
   },
   {
     "dir": "guitar-holders",
-    "first": "images/guitar-holders/IMG_20250617_122033337.jpg",
+    "first": "images/guitar-holders/0.jpg",
     "files": [
       "images/guitar-holders/0.jpg",
       "images/guitar-holders/IMG_20250617_122014152.jpg",
@@ -184,7 +191,7 @@
   },
   {
     "dir": "johns-knife",
-    "first": "images/johns-knife/PXL_20251225_214110671.jpg",
+    "first": "images/johns-knife/IMG_20251216_195344050.jpg",
     "files": [
       "images/johns-knife/IMG_20251216_195344050.jpg",
       "images/johns-knife/IMG_20251216_203400047.jpg",
@@ -193,7 +200,7 @@
   },
   {
     "dir": "kids-bookself",
-    "first": "images/kids-bookself/PXL_20260118_011615389.jpg",
+    "first": "images/kids-bookself/PXL_20260117_220711732.jpg",
     "files": [
       "images/kids-bookself/PXL_20260117_220711732.jpg",
       "images/kids-bookself/PXL_20260117_220715525.jpg",
@@ -202,16 +209,16 @@
   },
   {
     "dir": "lukes-standing-desk",
-    "first": "images/lukes-standing-desk/IMG_20251126_133759323.jpg",
+    "first": "images/lukes-standing-desk/first.jpg",
     "files": [
-      "images/lukes-standing-desk/IMG_20251126_133719366.jpg",
       "images/lukes-standing-desk/IMG_20251126_133751499.jpg",
-      "images/lukes-standing-desk/IMG_20251126_133759323.jpg"
+      "images/lukes-standing-desk/IMG_20251126_133759323.jpg",
+      "images/lukes-standing-desk/first.jpg"
     ]
   },
   {
     "dir": "megs-bench",
-    "first": "images/megs-bench/1.jpg",
+    "first": "images/megs-bench/0.jpg",
     "files": [
       "images/megs-bench/0.jpg",
       "images/megs-bench/1.jpg"
@@ -219,7 +226,7 @@
   },
   {
     "dir": "megs-end-table",
-    "first": "images/megs-end-table/IMG_20251002_191736.jpg",
+    "first": "images/megs-end-table/IMG_20250930_210147743.jpg",
     "files": [
       "images/megs-end-table/IMG_20250930_210147743.jpg",
       "images/megs-end-table/IMG_20250930_210154181.jpg",
@@ -228,7 +235,7 @@
   },
   {
     "dir": "meredith-cutting-board",
-    "first": "images/meredith-cutting-board/IMG_20251216_203410374.jpg",
+    "first": "images/meredith-cutting-board/IMG_20251215_200011355.jpg",
     "files": [
       "images/meredith-cutting-board/IMG_20251215_200011355.jpg",
       "images/meredith-cutting-board/IMG_20251216_203410374.jpg"
@@ -236,27 +243,58 @@
   },
   {
     "dir": "milling",
-    "first": "images/milling/5.jpg",
+    "first": "images/milling/first.jpg",
     "files": [
       "images/milling/0-old.jpg",
       "images/milling/0.jpg",
       "images/milling/1.jpg",
       "images/milling/3.jpg",
-      "images/milling/4.jpg",
-      "images/milling/5.jpg"
+      "images/milling/5.jpg",
+      "images/milling/first.jpg"
+    ]
+  },
+  {
+    "dir": "mothers-cutting-board",
+    "first": "images/mothers-cutting-board/PXL_20260119_231953660.jpg",
+    "files": [
+      "images/mothers-cutting-board/PXL_20260119_231953660.jpg"
+    ]
+  },
+  {
+    "dir": "one-shelf-bookshelf",
+    "first": "images/one-shelf-bookshelf/PXL_20260118_133127444.jpg",
+    "files": [
+      "images/one-shelf-bookshelf/PXL_20260118_133127444.jpg",
+      "images/one-shelf-bookshelf/PXL_20260118_133137988.jpg"
+    ]
+  },
+  {
+    "dir": "pencil-holder",
+    "first": "images/pencil-holder/PXL_20260119_231840438.jpg",
+    "files": [
+      "images/pencil-holder/PXL_20260119_231840438.jpg",
+      "images/pencil-holder/PXL_20260119_231846970.jpg"
     ]
   },
   {
     "dir": "pine-bench",
-    "first": "images/pine-bench/1.jpg",
+    "first": "images/pine-bench/0.jpg",
     "files": [
       "images/pine-bench/0.jpg",
       "images/pine-bench/1.jpg"
     ]
   },
   {
+    "dir": "random-box",
+    "first": "images/random-box/PXL_20260119_232622325.jpg",
+    "files": [
+      "images/random-box/PXL_20260119_232622325.jpg",
+      "images/random-box/PXL_20260119_232630229.jpg"
+    ]
+  },
+  {
     "dir": "scrabble-name-board",
-    "first": "images/scrabble-name-board/PXL_20260103_191252514.jpg",
+    "first": "images/scrabble-name-board/PXL_20260103_034607236.jpg",
     "files": [
       "images/scrabble-name-board/PXL_20260103_034607236.jpg",
       "images/scrabble-name-board/PXL_20260103_191252514.jpg"
@@ -264,7 +302,7 @@
   },
   {
     "dir": "small-bookself",
-    "first": "images/small-bookself/1.jpg",
+    "first": "images/small-bookself/0.jpg",
     "files": [
       "images/small-bookself/0.jpg",
       "images/small-bookself/1.jpg"
@@ -279,7 +317,7 @@
   },
   {
     "dir": "tv-stand",
-    "first": "images/tv-stand/IMG_20240105_114949346.jpg",
+    "first": "images/tv-stand/0.jpg",
     "files": [
       "images/tv-stand/0.jpg",
       "images/tv-stand/IMG_20240105_114945923.jpg",
@@ -289,7 +327,7 @@
   },
   {
     "dir": "ukulele",
-    "first": "images/ukulele/IMG_20251117_190229.jpg",
+    "first": "images/ukulele/114a296f-a0d0-4156-82e1-eaec4f18ff3f.jpg",
     "files": [
       "images/ukulele/114a296f-a0d0-4156-82e1-eaec4f18ff3f.jpg",
       "images/ukulele/IMG_20251103_190306836.jpg",
@@ -303,13 +341,12 @@
   },
   {
     "dir": "walnut-bookself",
-    "first": "images/walnut-bookself/4.jpg",
+    "first": "images/walnut-bookself/0.jpg",
     "files": [
       "images/walnut-bookself/0.jpg",
       "images/walnut-bookself/1.jpg",
       "images/walnut-bookself/2.jpg",
-      "images/walnut-bookself/3.jpg",
-      "images/walnut-bookself/4.jpg"
+      "images/walnut-bookself/3.jpg"
     ]
   }
 ]
