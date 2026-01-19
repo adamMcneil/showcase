@@ -1,12 +1,390 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stuff I made out of Wood</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stuff I made out of Wood</title>
+  <style>
+    :root{
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --muted: #666;
+    }
+    *{box-sizing:border-box}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:#111}
+    .container{max-width:1000px;margin:40px auto;padding:0 20px}
+    h1{margin:0 0 6px}
+    .subtitle{margin:0 0 20px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);display:flex;flex-direction:column;text-decoration:none;border:none;padding:0;cursor:pointer}
+    .card:hover{box-shadow:0 4px 8px rgba(0,0,0,0.15)}
+    .thumb{aspect-ratio:16/11;background:#eee;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .title{padding:10px 12px;font-weight:600}
+    .link{color:inherit}
+
+    /* Modal styles */
+    .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:90}
+    .modal.active{display:flex}
+    .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.5);cursor:pointer}
+    .modal-content{position:relative;background:var(--card);border-radius:8px;padding:12px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:12px;z-index:91}
+    .modal-header{display:flex;align-items:center;justify-content:space-between}
+    .modal-header h3{margin:0}
+    .modal-body{display:flex;align-items:center;gap:8px}
+    .modal-image{width:70vw;height:60vh;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px}
+    .modal-image img{width:100%;height:100%;object-fit:contain}
+    .nav{background:transparent;border:none;color:#fff;font-size:22px;padding:8px;cursor:pointer}
+    .nav.left{margin-right:6px}
+    .nav.right{margin-left:6px}
+    .thumb-row{display:flex;gap:8px;overflow:auto;padding-bottom:6px}
+    .thumb-item{border:2px solid transparent;padding:2px;border-radius:4px;background:transparent;cursor:pointer}
+    .thumb-item img{height:60px;width:80px;object-fit:cover;display:block}
+    .thumb-item.active{border-color:#333}
+    .close{background:transparent;border:none;font-size:20px;cursor:pointer}
+
+    @media (max-width: 768px) {
+      .modal-image{width:85vw;height:50vh}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stuff I made out of Wood</h1>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-backdrop" id="backdrop"></div>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button class="close" id="close-btn" aria-label="Close">✕</button>
+      </header>
+      <div class="modal-body">
+        <button class="nav left" id="prev-btn" aria-label="Previous">◀</button>
+        <div class="modal-image">
+          <img id="modal-img" alt="" />
+        </div>
+        <button class="nav right" id="next-btn" aria-label="Next">▶</button>
+      </div>
+      <div class="thumb-row" id="thumb-row"></div>
+    </div>
+  </div>
+
+  <script>
+    const imageIndex = [
+      {
+        "dir": "austin-wedding-sign",
+        "first": "images/austin-wedding-sign/IMG_20251025_080434189_HDR.jpg",
+        "files": [
+          "images/austin-wedding-sign/IMG_20251025_080434189_HDR.jpg",
+          "images/austin-wedding-sign/IMG_20251025_080438998_HDR.jpg",
+          "images/austin-wedding-sign/IMG_20251101_125541418.jpg"
+        ]
+      },
+      {
+        "dir": "basket-stand",
+        "first": "images/basket-stand/0.jpg",
+        "files": [
+          "images/basket-stand/0.jpg",
+          "images/basket-stand/1.jpg"
+        ]
+      },
+      {
+        "dir": "bens-table",
+        "first": "images/bens-table/0.jpg",
+        "files": [
+          "images/bens-table/0.jpg",
+          "images/bens-table/IMG_20250619_194436745.jpg",
+          "images/bens-table/IMG_20250619_194454063.jpg",
+          "images/bens-table/IMG_20250619_194504317.jpg",
+          "images/bens-table/IMG_20250619_194508016.jpg"
+        ]
+      },
+      {
+        "dir": "box",
+        "first": "images/box/IMG_20251017_180553693.jpg",
+        "files": [
+          "images/box/IMG_20251017_180553693.jpg",
+          "images/box/IMG_20251017_180559683.jpg",
+          "images/box/IMG_20251017_180611196.jpg",
+          "images/box/IMG_20251017_180620398.jpg",
+          "images/box/IMG_20251017_180649851.jpg",
+          "images/box/IMG_20251017_180707279.jpg"
+        ]
+      },
+      {
+        "dir": "catan",
+        "first": "images/catan/0.jpg",
+        "files": [
+          "images/catan/0.jpg",
+          "images/catan/1.jpg",
+          "images/catan/IMG_20250613_154442483.jpg",
+          "images/catan/IMG_20250614_120601545.jpg",
+          "images/catan/IMG_20250616_193816154.jpg",
+          "images/catan/IMG_20250620_123711005.jpg",
+          "images/catan/IMG_20250623_152937104.jpg",
+          "images/catan/IMG_20250623_152941286.jpg",
+          "images/catan/IMG_20250623_153017620.jpg",
+          "images/catan/IMG_20250623_153024452.jpg",
+          "images/catan/IMG_20250623_153046139.jpg",
+          "images/catan/IMG_20250623_153105098.jpg",
+          "images/catan/IMG_20250623_153130253.jpg",
+          "images/catan/IMG_20250623_153150538.jpg",
+          "images/catan/IMG_20250623_153243503.jpg",
+          "images/catan/IMG_20250623_153321713.jpg",
+          "images/catan/IMG_20250623_153334839.jpg",
+          "images/catan/IMG_20250623_153735003.jpg",
+          "images/catan/IMG_20250702_091751135_HDR.jpg",
+          "images/catan/IMG_20250702_091806019_HDR.jpg",
+          "images/catan/IMG_20250702_091812345_HDR.jpg",
+          "images/catan/IMG_20250702_091835041_HDR.jpg",
+          "images/catan/IMG_20250702_091843396_HDR.jpg",
+          "images/catan/IMG_20250702_091852504_HDR.jpg",
+          "images/catan/IMG_20250702_092444553_HDR.jpg",
+          "images/catan/IMG_20250702_092457140.jpg",
+          "images/catan/IMG_20250702_092501268.jpg",
+          "images/catan/IMG_20250702_092506158.jpg",
+          "images/catan/IMG_20250702_092556720_HDR.jpg",
+          "images/catan/IMG_20250702_093603463.jpg",
+          "images/catan/IMG_20250702_093609931.jpg",
+          "images/catan/IMG_20250702_093935632.jpg",
+          "images/catan/IMG_20250702_093935757.jpg",
+          "images/catan/IMG_20250702_093937202.jpg",
+          "images/catan/old.jpg"
+        ]
+      },
+      {
+        "dir": "cherry-bench",
+        "first": "images/cherry-bench/0.jpg",
+        "files": [
+          "images/cherry-bench/0.jpg",
+          "images/cherry-bench/1.jpg"
+        ]
+      },
+      {
+        "dir": "end-table",
+        "first": "images/end-table/0.jpg",
+        "files": [
+          "images/end-table/0.jpg",
+          "images/end-table/1.jpg"
+        ]
+      },
+      {
+        "dir": "first-box",
+        "first": "images/first-box/0.jpg",
+        "files": [
+          "images/first-box/0.jpg",
+          "images/first-box/1.jpg",
+          "images/first-box/2.jpg"
+        ]
+      },
+      {
+        "dir": "first-cajon",
+        "first": "images/first-cajon/0.jpg",
+        "files": [
+          "images/first-cajon/0.jpg",
+          "images/first-cajon/IMG_20250616_130829010_HDR.jpg",
+          "images/first-cajon/IMG_20250616_130836940_HDR.jpg",
+          "images/first-cajon/IMG_20250616_130840671_HDR.jpg",
+          "images/first-cajon/IMG_20250616_130848721_HDR.jpg"
+        ]
+      },
+      {
+        "dir": "first-live-edge",
+        "first": "images/first-live-edge/0.jpg",
+        "files": [
+          "images/first-live-edge/0.jpg"
+        ]
+      },
+      {
+        "dir": "guitar-holders",
+        "first": "images/guitar-holders/0.jpg",
+        "files": [
+          "images/guitar-holders/0.jpg",
+          "images/guitar-holders/IMG_20250617_122014152.jpg",
+          "images/guitar-holders/IMG_20250617_122025786.jpg",
+          "images/guitar-holders/IMG_20250617_122033337.jpg"
+        ]
+      },
+      {
+        "dir": "island",
+        "first": "images/island/0.jpg",
+        "files": [
+          "images/island/0.jpg"
+        ]
+      },
+      {
+        "dir": "megs-bench",
+        "first": "images/megs-bench/0.jpg",
+        "files": [
+          "images/megs-bench/0.jpg",
+          "images/megs-bench/1.jpg"
+        ]
+      },
+      {
+        "dir": "milling",
+        "first": "images/milling/0-old.jpg",
+        "files": [
+          "images/milling/0-old.jpg",
+          "images/milling/0.jpg",
+          "images/milling/1.jpg",
+          "images/milling/3.jpg",
+          "images/milling/4.jpg",
+          "images/milling/5.jpg"
+        ]
+      },
+      {
+        "dir": "pine-bench",
+        "first": "images/pine-bench/0.jpg",
+        "files": [
+          "images/pine-bench/0.jpg",
+          "images/pine-bench/1.jpg"
+        ]
+      },
+      {
+        "dir": "small-bookself",
+        "first": "images/small-bookself/0.jpg",
+        "files": [
+          "images/small-bookself/0.jpg",
+          "images/small-bookself/1.jpg"
+        ]
+      },
+      {
+        "dir": "table",
+        "first": "images/table/0.jpg",
+        "files": [
+          "images/table/0.jpg"
+        ]
+      },
+      {
+        "dir": "tv-stand",
+        "first": "images/tv-stand/0.jpg",
+        "files": [
+          "images/tv-stand/0.jpg",
+          "images/tv-stand/IMG_20240105_114945923.jpg",
+          "images/tv-stand/IMG_20240105_114946941.jpg",
+          "images/tv-stand/IMG_20240105_114949346.jpg"
+        ]
+      },
+      {
+        "dir": "ukulele",
+        "first": "images/ukulele/114a296f-a0d0-4156-82e1-eaec4f18ff3f.jpg",
+        "files": [
+          "images/ukulele/114a296f-a0d0-4156-82e1-eaec4f18ff3f.jpg",
+          "images/ukulele/IMG_20251103_190306836.jpg",
+          "images/ukulele/IMG_20251106_172740408.jpg",
+          "images/ukulele/IMG_20251107_191826388.jpg",
+          "images/ukulele/IMG_20251107_191936202.jpg"
+        ]
+      },
+      {
+        "dir": "walnut-bookself",
+        "first": "images/walnut-bookself/0.jpg",
+        "files": [
+          "images/walnut-bookself/0.jpg",
+          "images/walnut-bookself/1.jpg",
+          "images/walnut-bookself/2.jpg",
+          "images/walnut-bookself/3.jpg",
+          "images/walnut-bookself/4.jpg"
+        ]
+      }
+    ];
+
+    let currentEntry = null;
+    let currentIdx = 0;
+
+    function openModal(entry) {
+      currentEntry = entry;
+      currentIdx = 0;
+      updateModal();
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      currentEntry = null;
+    }
+
+    function updateModal() {
+      if (!currentEntry) return;
+      const files = currentEntry.files || [currentEntry.first];
+      document.getElementById('modal-title').textContent = currentEntry.dir;
+      document.getElementById('modal-img').src = files[currentIdx];
+      document.getElementById('modal-img').alt = `${currentEntry.dir} ${currentIdx + 1}`;
+      
+      // Update thumbnails
+      const thumbRow = document.getElementById('thumb-row');
+      thumbRow.innerHTML = '';
+      files.forEach((f, i) => {
+        const btn = document.createElement('button');
+        btn.className = `thumb-item ${i === currentIdx ? 'active' : ''}`;
+        const img = document.createElement('img');
+        img.src = f;
+        img.alt = `thumb-${i}`;
+        btn.appendChild(img);
+        btn.onclick = () => { currentIdx = i; updateModal(); };
+        thumbRow.appendChild(btn);
+      });
+    }
+
+    function prev() {
+      if (!currentEntry) return;
+      const files = currentEntry.files || [currentEntry.first];
+      currentIdx = (currentIdx - 1 + files.length) % files.length;
+      updateModal();
+    }
+
+    function next() {
+      if (!currentEntry) return;
+      const files = currentEntry.files || [currentEntry.first];
+      currentIdx = (currentIdx + 1) % files.length;
+      updateModal();
+    }
+
+    // Event listeners
+    document.getElementById('close-btn').onclick = closeModal;
+    document.getElementById('backdrop').onclick = closeModal;
+    document.getElementById('prev-btn').onclick = prev;
+    document.getElementById('next-btn').onclick = next;
+
+    // Render gallery
+    function renderGallery() {
+      const grid = document.getElementById('grid');
+      imageIndex.forEach(entry => {
+        const card = document.createElement('button');
+        card.className = 'card';
+        card.setAttribute('aria-label', `Open ${entry.dir}`);
+        
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        
+        const img = document.createElement('img');
+        img.src = entry.first;
+        img.alt = entry.dir;
+        thumb.appendChild(img);
+        
+        const title = document.createElement('div');
+        title.className = 'title';
+        title.textContent = entry.dir;
+        
+        card.appendChild(thumb);
+        card.appendChild(title);
+        card.onclick = () => openModal(entry);
+        
+        grid.appendChild(card);
+      });
+    }
+
+    renderGallery();
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (!currentEntry) return;
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
 </html>
