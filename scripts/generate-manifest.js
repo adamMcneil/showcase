@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 
 const imagesDir = path.join(__dirname, '..', 'images')
-const outFile = path.join(__dirname, '..', 'src', 'imageIndex.json')
+const outFile = path.join(__dirname, '..', 'images-manifest.json')
 
 function isImage(name) {
   return /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(name)

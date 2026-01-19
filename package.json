@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "python3 -m http.server 8000 || npx http-server",
-    "build": "mkdir -p dist && cp index.html dist/ && cp -r images dist/"
+    "dev": "node scripts/generate-manifest.js && (python3 -m http.server 8000 || npx http-server)",
+    "build": "node scripts/generate-manifest.js && mkdir -p dist && cp index.html dist/ && cp images-manifest.json dist/ && cp -r images dist/"
   },
   "dependencies": {}
 }
