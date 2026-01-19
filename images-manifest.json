@@ -43,14 +43,14 @@
   },
   {
     "dir": "box",
-    "first": "images/box/IMG_20251017_180553693.jpg",
+    "first": "images/box/first.jpg",
     "files": [
       "images/box/IMG_20251017_180553693.jpg",
       "images/box/IMG_20251017_180559683.jpg",
       "images/box/IMG_20251017_180611196.jpg",
       "images/box/IMG_20251017_180620398.jpg",
       "images/box/IMG_20251017_180649851.jpg",
-      "images/box/IMG_20251017_180707279.jpg"
+      "images/box/first.jpg"
     ]
   },
   {
@@ -327,7 +327,7 @@
   },
   {
     "dir": "ukulele",
-    "first": "images/ukulele/114a296f-a0d0-4156-82e1-eaec4f18ff3f.jpg",
+    "first": "images/ukulele/first.jpg",
     "files": [
       "images/ukulele/114a296f-a0d0-4156-82e1-eaec4f18ff3f.jpg",
       "images/ukulele/IMG_20251103_190306836.jpg",
@@ -336,7 +336,7 @@
       "images/ukulele/IMG_20251107_191936202.jpg",
       "images/ukulele/IMG_20251113_203332.jpg",
       "images/ukulele/IMG_20251113_203340.jpg",
-      "images/ukulele/IMG_20251117_190229.jpg"
+      "images/ukulele/first.jpg"
     ]
   },
   {
