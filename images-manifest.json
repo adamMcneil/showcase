@@ -89,6 +89,18 @@
     ]
   },
   {
+    "dir": "chess-board",
+    "first": "images/chess-board/IMG_20250905_205038098.jpg",
+    "files": [
+      "images/chess-board/IMG_20250905_205038098.jpg",
+      "images/chess-board/IMG_20250905_205047232.jpg",
+      "images/chess-board/IMG_20250906_082434518.jpg",
+      "images/chess-board/IMG_20250906_082440275.jpg",
+      "images/chess-board/IMG_20250906_082731066.jpg",
+      "images/chess-board/IMG_20250906_085751905.jpg"
+    ]
+  },
+  {
     "dir": "end-table",
     "first": "images/end-table/0.jpg",
     "files": [
