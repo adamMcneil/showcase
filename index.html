@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stuff I made out of Wood</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <style>
     :root{
       --bg: #f7f7f8;
@@ -27,11 +30,11 @@
     .modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:90}
     .modal.active{display:flex}
     .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.5);cursor:pointer}
-    .modal-content{position:relative;background:var(--card);border-radius:8px;padding:12px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;gap:12px;z-index:91}
+    .modal-content{position:relative;background:var(--card);border-radius:8px;padding:12px;max-width:100vw;max-height:100vh;display:flex;flex-direction:column;gap:12px;z-index:91;width:100%;height:100%}
     .modal-header{display:flex;align-items:center;justify-content:space-between}
     .modal-header h3{margin:0}
-    .modal-body{display:flex;align-items:center;gap:8px}
-    .modal-image{width:70vw;height:60vh;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px}
+    .modal-body{display:flex;align-items:center;gap:8px;flex:1}
+    .modal-image{width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px}
     .modal-image img{width:100%;height:100%;object-fit:contain}
     .nav{background:transparent;border:none;color:#fff;font-size:22px;padding:8px;cursor:pointer}
     .nav.left{margin-right:6px}
@@ -41,6 +44,7 @@
     .thumb-item img{height:60px;width:80px;object-fit:cover;display:block}
     .thumb-item.active{border-color:#333}
     .close{background:transparent;border:none;font-size:20px;cursor:pointer}
+    .logo{height:60px;width:auto;margin-bottom:12px}
 
     @media (max-width: 768px) {
       .modal-image{width:85vw;height:50vh}
@@ -141,6 +145,26 @@
     document.getElementById('backdrop').onclick = closeModal;
     document.getElementById('prev-btn').onclick = prev;
     document.getElementById('next-btn').onclick = next;
+
+    // Touch/Swipe navigation
+    let touchStartX = null;
+    document.getElementById('modal').addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+    
+    document.getElementById('modal').addEventListener('touchend', (e) => {
+      if (!touchStartX || !currentEntry) return;
+      const touchEndX = e.changedTouches[0].clientX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          next();
+        } else {
+          prev();
+        }
+      }
+      touchStartX = null;
+    });
 
     // Render gallery
     function renderGallery() {
