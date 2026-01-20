@@ -14,6 +14,7 @@ function GalleryCard({ entry, onOpen }) {
 
 function Modal({ entry, startIndex = 0, onClose }) {
   const [idx, setIdx] = useState(startIndex)
+  const [touchStart, setTouchStart] = useState(null)
   if (!entry) return null
   const files = entry.files || [entry.first]
 
@@ -24,8 +25,26 @@ function Modal({ entry, startIndex = 0, onClose }) {
     setIdx((i) => (i + 1) % files.length)
   }
 
+  function handleTouchStart(e) {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  function handleTouchEnd(e) {
+    if (!touchStart) return
+    const touchEnd = e.changedTouches[0].clientX
+    const diff = touchStart - touchEnd
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        next()
+      } else {
+        prev()
+      }
+    }
+    setTouchStart(null)
+  }
+
   return (
-    <div className="modal" role="dialog" aria-modal="true">
+    <div className="modal" role="dialog" aria-modal="true" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div className="modal-backdrop" onClick={onClose} />
       <div className="modal-content">
         <header className="modal-header">

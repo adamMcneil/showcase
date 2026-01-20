@@ -208,6 +208,20 @@
     ]
   },
   {
+    "dir": "kids-cups",
+    "first": "images/kids-cups/PXL_20260120_230653596.jpg",
+    "files": [
+      "images/kids-cups/PXL_20260120_230653596.jpg"
+    ]
+  },
+  {
+    "dir": "lukes-sign",
+    "first": "images/lukes-sign/4499255079334851761.jpg.jpeg",
+    "files": [
+      "images/lukes-sign/4499255079334851761.jpg.jpeg"
+    ]
+  },
+  {
     "dir": "lukes-standing-desk",
     "first": "images/lukes-standing-desk/first.jpg",
     "files": [
@@ -262,10 +276,12 @@
   },
   {
     "dir": "one-shelf-bookshelf",
-    "first": "images/one-shelf-bookshelf/PXL_20260118_133127444.jpg",
+    "first": "images/one-shelf-bookshelf/first.jpg",
     "files": [
       "images/one-shelf-bookshelf/PXL_20260118_133127444.jpg",
-      "images/one-shelf-bookshelf/PXL_20260118_133137988.jpg"
+      "images/one-shelf-bookshelf/PXL_20260118_133137988.jpg",
+      "images/one-shelf-bookshelf/PXL_20260120_231624653.jpg",
+      "images/one-shelf-bookshelf/first.jpg"
     ]
   },
   {
