@@ -121,6 +121,11 @@ async function main() {
     console.log('Generating manifest from Cloudinary...')
     result = await fromCloudinary(nameOverrides)
   } else {
+    const imagesDir = path.join(root, 'images')
+    if (!fs.existsSync(imagesDir)) {
+      console.log('No CLOUDINARY_CLOUD_NAME and no images/ dir — skipping manifest generation.')
+      return
+    }
     console.log('No CLOUDINARY_CLOUD_NAME set, using local images/...')
     result = fromLocal(nameOverrides)
   }
