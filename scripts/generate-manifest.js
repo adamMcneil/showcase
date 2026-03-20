@@ -11,7 +11,7 @@ const fs = require('fs')
 const path = require('path')
 
 const root = path.join(__dirname, '..')
-const outFile = path.join(root, 'images-manifest.json')
+const outFile = path.join(root, 'public', 'images-manifest.json')
 
 // Load name overrides from folders.json if it exists
 function loadNameOverrides() {
