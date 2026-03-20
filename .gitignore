@@ -1,6 +1,8 @@
 dist
 node_modules
 .env
+!.env.example
+images-manifest.json
 .DS_Store
 .vscode
 .idea

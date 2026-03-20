@@ -5,8 +5,10 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/generate-manifest.js && vite",
-    "build": "node scripts/generate-manifest.js && vite build && cp -r images dist/ && cp images-manifest.json dist/",
-    "preview": "vite preview"
+    "build": "node scripts/generate-manifest.js && vite build",
+    "preview": "vite preview",
+    "upload": "node scripts/upload-to-cloudinary.js",
+    "generate-manifest": "node scripts/generate-manifest.js"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -14,6 +16,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "cloudinary": "^2.5.1",
+    "dotenv": "^16.4.7",
     "vite": "^6.0.0"
   }
 }

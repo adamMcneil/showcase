@@ -28,19 +28,18 @@ export default function Modal({ entry, idx, onClose, onNavigate, onSetIdx }) {
 
   return (
     <div className="modal" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-      <div className="modal-backdrop" onClick={onClose} />
-      <div className="modal-content">
-        <header className="modal-header">
-          <h3>{entry.dir}</h3>
-          <button className="close" onClick={onClose} aria-label="Close">✕</button>
-        </header>
-        <div className="modal-body">
-          <button className="nav left" onClick={() => onNavigate(-1)} aria-label="Previous">◀</button>
-          <div className="modal-image">
-            <img src={files[idx]} alt={`${entry.dir} ${idx + 1}`} />
-          </div>
-          <button className="nav right" onClick={() => onNavigate(1)} aria-label="Next">▶</button>
-        </div>
+      <div className="modal-top">
+        <span className="modal-title">{entry.dir}</span>
+        <button className="close" onClick={onClose} aria-label="Close">✕</button>
+      </div>
+
+      <div className="modal-image-wrap">
+        <button className="nav left" onClick={() => onNavigate(-1)} aria-label="Previous">‹</button>
+        <img className="modal-img" src={files[idx]} alt={`${entry.dir} ${idx + 1}`} />
+        <button className="nav right" onClick={() => onNavigate(1)} aria-label="Next">›</button>
+      </div>
+
+      {files.length > 1 && (
         <div className="thumb-row">
           {files.map((f, i) => (
             <button
@@ -52,7 +51,7 @@ export default function Modal({ entry, idx, onClose, onNavigate, onSetIdx }) {
             </button>
           ))}
         </div>
-      </div>
+      )}
     </div>
   )
 }

@@ -8,7 +8,7 @@ export default function Card({ entry, onOpen }) {
       onClick={() => onOpen(entry)}
     >
       <div className="thumb">
-        <img src={entry.first} alt={entry.dir} />
+        <img src={entry.thumb ?? entry.first} alt={entry.dir} loading="lazy" decoding="async" />
       </div>
       <div className="title">{entry.dir}</div>
     </button>
