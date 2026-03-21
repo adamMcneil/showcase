@@ -10,3 +10,4 @@ images-manifest.json
 *.log
 coverage
 *.tmp
+.playwright-mcp
