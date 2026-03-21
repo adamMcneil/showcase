@@ -45,34 +45,33 @@ async function fromCloudinary(nameOverrides) {
   })
   const full = id => cloudinary.url(id, { secure: true, fetch_format: 'auto', quality: 'auto' })
 
-  // Fetch all resources under showcase/
-  let resources = []
+  // Fetch all resources using dynamic folder mode (asset_folder grouping)
+  const groups = {} // folder -> [{ name, public_id }]
   let nextCursor
   do {
-    const res = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'showcase/',
-      max_results: 500,
-      next_cursor: nextCursor,
-    })
-    resources = resources.concat(res.resources)
+    const res = await new Promise((resolve, reject) =>
+      cloudinary.api.resources({ max_results: 500, next_cursor: nextCursor }, (err, r) =>
+        err ? reject(err) : resolve(r)
+      )
+    )
+    for (const r of res.resources) {
+      const assetFolder = r.asset_folder ?? ''
+      // Only include assets one level under the root folder (e.g. images/<folder>)
+      const parts = assetFolder.split('/')
+      if (parts.length !== 2) continue
+      const [, folder] = parts
+      // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
+      const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
+      if (!groups[folder]) groups[folder] = []
+      groups[folder].push({ name, public_id: r.public_id })
+    }
     nextCursor = res.next_cursor
   } while (nextCursor)
 
-  // Group by folder
-  const groups = {}
-  for (const r of resources) {
-    const parts = r.public_id.split('/')  // ['showcase', 'folder', 'file']
-    if (parts.length < 3) continue
-    const folder = parts[1]
-    if (!groups[folder]) groups[folder] = []
-    groups[folder].push({ file: parts[2], public_id: r.public_id })
-  }
-
   const result = []
   for (const [folder, items] of Object.entries(groups)) {
-    items.sort((a, b) => a.file.localeCompare(b.file))
-    const firstItem = items.find(i => i.file.toLowerCase() === 'first') ?? items[0]
+    items.sort((a, b) => a.name.localeCompare(b.name))
+    const firstItem = items.find(i => i.name.toLowerCase() === 'first') ?? items[0]
     result.push({
       dir: nameOverrides[folder] ?? toTitle(folder),
       thumb: thumb(firstItem.public_id),
