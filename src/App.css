@@ -27,6 +27,20 @@ h1 {
   text-transform: uppercase;
 }
 
+.skeleton-card {
+  aspect-ratio: 4/3;
+  border-radius: 4px;
+  background: #e4e4e4;
+  animation: pulse 1.2s ease-in-out infinite;
+  /* leave room where the title sits under real cards */
+  margin-bottom: 20px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
 @media (max-width: 600px) {
   .container { margin: 20px auto; padding: 0 14px; }
   h1 { margin-bottom: 16px; }

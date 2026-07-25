@@ -4,7 +4,7 @@ import Modal from './components/Modal'
 import './App.css'
 
 export default function App() {
-  const [entries, setEntries] = useState([])
+  const [entries, setEntries] = useState(null) // null = loading
   const [error, setError] = useState(null)
   const [modal, setModal] = useState(null) // { entry, idx }
 
@@ -18,12 +18,21 @@ export default function App() {
       .catch(e => setError(e.message))
   }, [])
 
+  // Back button (especially on mobile) closes the viewer instead of leaving the site
+  useEffect(() => {
+    const onPop = () => setModal(null)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
   const openModal = useCallback((entry) => {
     setModal({ entry, idx: 0 })
+    window.history.pushState({ modal: true }, '')
   }, [])
 
   const closeModal = useCallback(() => {
-    setModal(null)
+    if (window.history.state?.modal) window.history.back()
+    else setModal(null)
   }, [])
 
   const navigate = useCallback((dir) => {
@@ -44,7 +53,15 @@ export default function App() {
   return (
     <div className="container">
       <h1>Stuff I made out of Wood</h1>
-      <Gallery entries={entries} onOpen={openModal} />
+      {entries === null ? (
+        <div className="grid" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => (
+            <div key={i} className="skeleton-card" />
+          ))}
+        </div>
+      ) : (
+        <Gallery entries={entries} onOpen={openModal} />
+      )}
       {modal && (
         <Modal
           entry={modal.entry}
