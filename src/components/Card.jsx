@@ -25,8 +25,8 @@ export default function Card({ entry, onOpen }) {
       <div className="thumb">
         <img
           src={sized(entry.thumb ?? entry.first, 600)}
-          srcSet={[300, 600, 900].map(w => `${sized(entry.thumb ?? entry.first, w)} ${w}w`).join(', ')}
-          sizes="(max-width: 600px) 50vw, 220px"
+          srcSet={[300, 600, 900, 1200].map(w => `${sized(entry.thumb ?? entry.first, w)} ${w}w`).join(', ')}
+          sizes="(max-width: 600px) 100vw, 220px"
           alt={entry.dir}
           loading="lazy"
           decoding="async"
