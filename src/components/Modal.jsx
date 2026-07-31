@@ -10,6 +10,9 @@ export default function Modal({ entry, idx, onClose, onNavigate, onSetIdx }) {
   const [loaded, setLoaded] = useState(false)
 
   const hiSrc = full(files[idx])
+  const date = entry.dates?.[idx]
+    ? new Date(entry.dates[idx]).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+    : null
 
   useEffect(() => {
     function handleKey(e) {
@@ -76,6 +79,7 @@ export default function Modal({ entry, idx, onClose, onNavigate, onSetIdx }) {
     >
       <div className="modal-top">
         <span className="modal-title">{entry.dir}</span>
+        {date && <span className="photo-date">{date}</span>}
         {files.length > 1 && <span className="counter">{idx + 1} / {files.length}</span>}
         <button className="close" onClick={onClose} aria-label="Close">✕</button>
       </div>

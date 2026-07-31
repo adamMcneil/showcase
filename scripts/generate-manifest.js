@@ -70,16 +70,18 @@ async function fromCloudinary(nameOverrides) {
 
   const result = []
   for (const [folder, items] of Object.entries(groups)) {
-    items.sort((a, b) => a.name.localeCompare(b.name))
+    // Oldest upload first within a folder
+    items.sort((a, b) => a.created_at.localeCompare(b.created_at))
     const firstItem = items.find(i => i.name.toLowerCase() === 'first') ?? items[0]
     // Date the folder was added to Cloudinary = earliest upload in it
-    const added = items.reduce((min, i) => (i.created_at < min ? i.created_at : min), items[0].created_at)
+    const added = items[0].created_at
     result.push({
       dir: nameOverrides[folder] ?? toTitle(folder),
       added,
       thumb: thumb(firstItem.public_id),
       first: full(firstItem.public_id),
       files: items.map(i => full(i.public_id)),
+      dates: items.map(i => i.created_at),
     })
   }
 

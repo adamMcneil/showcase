@@ -33,6 +33,14 @@
   flex-shrink: 0;
 }
 
+.photo-date {
+  color: #888;
+  font-size: 0.8rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .close {
   background: transparent;
   border: none;
