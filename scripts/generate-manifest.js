@@ -63,7 +63,7 @@ async function fromCloudinary(nameOverrides) {
       // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
       const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
       if (!groups[folder]) groups[folder] = []
-      groups[folder].push({ name, public_id: r.public_id })
+      groups[folder].push({ name, public_id: r.public_id, created_at: r.created_at })
     }
     nextCursor = res.next_cursor
   } while (nextCursor)
@@ -72,15 +72,19 @@ async function fromCloudinary(nameOverrides) {
   for (const [folder, items] of Object.entries(groups)) {
     items.sort((a, b) => a.name.localeCompare(b.name))
     const firstItem = items.find(i => i.name.toLowerCase() === 'first') ?? items[0]
+    // Date the folder was added to Cloudinary = earliest upload in it
+    const added = items.reduce((min, i) => (i.created_at < min ? i.created_at : min), items[0].created_at)
     result.push({
       dir: nameOverrides[folder] ?? toTitle(folder),
+      added,
       thumb: thumb(firstItem.public_id),
       first: full(firstItem.public_id),
       files: items.map(i => full(i.public_id)),
     })
   }
 
-  return result.sort((a, b) => a.dir.localeCompare(b.dir))
+  // Newest folders first
+  return result.sort((a, b) => b.added.localeCompare(a.added))
 }
 
 // ── Local fallback ────────────────────────────────────────────────────────────
