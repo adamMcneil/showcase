@@ -18,13 +18,43 @@ body {
   padding: 0 24px;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
 h1 {
-  margin: 0 0 24px;
+  margin: 0;
   font-size: 1rem;
   font-weight: 500;
   color: #444;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+}
+
+.search {
+  padding: 7px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  width: 230px;
+  background: #fff;
+  color: #111;
+}
+
+.search:focus {
+  outline: none;
+  border-color: #999;
+}
+
+.no-results {
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .skeleton-card {
@@ -43,5 +73,6 @@ h1 {
 
 @media (max-width: 600px) {
   .container { margin: 20px auto; padding: 0 14px; }
-  h1 { margin-bottom: 16px; }
+  .header { margin-bottom: 16px; }
+  .search { width: 100%; }
 }

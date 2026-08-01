@@ -5,6 +5,9 @@ import './Card.css'
 export default function Card({ entry, onOpen }) {
   const preloaded = useRef(false)
   const count = entry.files?.length ?? 1
+  const added = entry.added
+    ? new Date(entry.added).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+    : null
 
   // Warm the cache for the full-size image as soon as the user shows intent.
   function preload() {
@@ -42,6 +45,7 @@ export default function Card({ entry, onOpen }) {
         )}
       </div>
       <div className="title">{entry.dir}</div>
+      {added && <div className="card-date">{added}</div>}
     </button>
   )
 }

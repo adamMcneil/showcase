@@ -7,6 +7,7 @@ export default function App() {
   const [entries, setEntries] = useState(null) // null = loading
   const [error, setError] = useState(null)
   const [modal, setModal] = useState(null) // { entry, idx }
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     fetch('images-manifest.json')
@@ -50,17 +51,33 @@ export default function App() {
 
   if (error) return <div className="container"><p>Error loading images</p></div>
 
+  const filtered = entries?.filter(e =>
+    e.dir.toLowerCase().includes(query.trim().toLowerCase())
+  )
+
   return (
     <div className="container">
-      <h1>Stuff I made out of Wood</h1>
+      <div className="header">
+        <h1>Stuff I made out of Wood</h1>
+        <input
+          className="search"
+          type="search"
+          placeholder="Search projects…"
+          aria-label="Search projects"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
+      </div>
       {entries === null ? (
         <div className="grid" aria-hidden="true">
           {Array.from({ length: 12 }, (_, i) => (
             <div key={i} className="skeleton-card" />
           ))}
         </div>
+      ) : filtered.length === 0 ? (
+        <p className="no-results">No projects match “{query.trim()}”</p>
       ) : (
-        <Gallery entries={entries} onOpen={openModal} />
+        <Gallery entries={filtered} onOpen={openModal} />
       )}
       {modal && (
         <Modal
