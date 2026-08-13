@@ -45,8 +45,14 @@ async function fromCloudinary(nameOverrides) {
   })
   const full = id => cloudinary.url(id, { secure: true, fetch_format: 'auto', quality: 'auto' })
 
+  // EXIF dates look like "2026:04:11 01:53:08" — convert to ISO for sorting/display
+  const exifToIso = s => {
+    const m = /^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}:\d{2}:\d{2})/.exec(s ?? '')
+    return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}` : null
+  }
+
   // Fetch all resources using dynamic folder mode (asset_folder grouping)
-  const groups = {} // folder -> [{ name, public_id }]
+  const assets = [] // { folder, name, public_id, created_at }
   let nextCursor
   do {
     const res = await new Promise((resolve, reject) =>
@@ -62,26 +68,50 @@ async function fromCloudinary(nameOverrides) {
       const [, folder] = parts
       // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
       const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
-      if (!groups[folder]) groups[folder] = []
-      groups[folder].push({ name, public_id: r.public_id, created_at: r.created_at })
+      assets.push({ folder, name, public_id: r.public_id, created_at: r.created_at })
     }
     nextCursor = res.next_cursor
   } while (nextCursor)
 
+  // EXIF is only exposed by the per-asset details endpoint, so fetch it for
+  // each asset (a few at a time) and prefer the date the photo was taken,
+  // falling back to upload date when EXIF is missing.
+  console.log(`Fetching EXIF dates for ${assets.length} assets...`)
+  const CONCURRENCY = 10
+  for (let i = 0; i < assets.length; i += CONCURRENCY) {
+    await Promise.all(
+      assets.slice(i, i + CONCURRENCY).map(async a => {
+        const details = await new Promise((resolve, reject) =>
+          cloudinary.api.resource(a.public_id, { image_metadata: true }, (err, r) =>
+            err ? reject(err) : resolve(r)
+          )
+        )
+        const meta = details.image_metadata ?? {}
+        a.taken = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate) ?? a.created_at
+      })
+    )
+  }
+
+  const groups = {} // folder -> [{ name, public_id, taken }]
+  for (const a of assets) {
+    if (!groups[a.folder]) groups[a.folder] = []
+    groups[a.folder].push(a)
+  }
+
   const result = []
   for (const [folder, items] of Object.entries(groups)) {
-    // Oldest upload first within a folder
-    items.sort((a, b) => a.created_at.localeCompare(b.created_at))
+    // Oldest photo first within a folder
+    items.sort((a, b) => a.taken.localeCompare(b.taken))
     const firstItem = items.find(i => i.name.toLowerCase() === 'first') ?? items[0]
-    // Date the folder was added to Cloudinary = earliest upload in it
-    const added = items[0].created_at
+    // Date of the folder = earliest photo taken in it
+    const added = items[0].taken
     result.push({
       dir: nameOverrides[folder] ?? toTitle(folder),
       added,
       thumb: thumb(firstItem.public_id),
       first: full(firstItem.public_id),
       files: items.map(i => full(i.public_id)),
-      dates: items.map(i => i.created_at),
+      dates: items.map(i => i.taken),
     })
   }
 
