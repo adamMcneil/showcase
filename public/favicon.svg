@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="500" height="500" viewBox="0 0 500 500"
+     role="img" aria-labelledby="title">
+  <title id="title">Symmetrical overlapping A W M circular logo</title>
+  <style>
+    /* Stay visible against a dark browser chrome. */
+    :root { --ink: #111; }
+    @media (prefers-color-scheme: dark) { :root { --ink: #fff; } }
+  </style>
+
+  <!-- Every coordinate is mirrored around x=250 and y=250. -->
+  <g fill="none" stroke="var(--ink)" stroke-width="20"
+     stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10">
+    <path d="M 91 91 L 130 250 L 165 110 L 210 250 L 250 130 L 290 250 L 335 110 L 370 250 L 409 91"/>
+    <path d="M 91 409 L 130 250 L 165 390 L 210 250 L 250 370 L 290 250 L 335 390 L 370 250 L 409 409"/>
+    <path d="M 85 250 H 415"/>
+    <circle cx="250" cy="250" r="225"/>
+  </g>
+</svg>

@@ -27,6 +27,19 @@ body {
   margin-bottom: 24px;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
 h1 {
   margin: 0;
   font-size: 1rem;
@@ -74,5 +87,7 @@ h1 {
 @media (max-width: 600px) {
   .container { margin: 20px auto; padding: 0 14px; }
   .header { margin-bottom: 16px; }
+  .brand { gap: 10px; }
+  .brand-logo { width: 32px; height: 32px; }
   .search { width: 100%; }
 }

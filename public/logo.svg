@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="500" height="500" viewBox="0 0 500 500"
+     role="img" aria-labelledby="title description">
+  <title id="title">Symmetrical overlapping A W M circular logo</title>
+  <desc id="description">A precisely balanced black geometric A, W, and M monogram enclosed by a perfect circle.</desc>
+
+  <!-- Every coordinate is mirrored around x=250 and y=250. -->
+  <g id="awm-monogram" fill="none" stroke="#111" stroke-width="20"
+     stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10">
+    <path id="upper-zigzag"
+          d="M 91 91 L 130 250 L 165 110 L 210 250 L 250 130 L 290 250 L 335 110 L 370 250 L 409 91"/>
+    <path id="lower-zigzag"
+          d="M 91 409 L 130 250 L 165 390 L 210 250 L 250 370 L 290 250 L 335 390 L 370 250 L 409 409"/>
+    <path id="crossbar" d="M 85 250 H 415"/>
+  </g>
+
+  <!-- Drawn last for a crisp, uninterrupted outer edge. -->
+  <circle id="border" cx="250" cy="250" r="225"
+          fill="none" stroke="#111" stroke-width="20"/>
+</svg>

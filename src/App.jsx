@@ -58,7 +58,10 @@ export default function App() {
   return (
     <div className="container">
       <div className="header">
-        <h1>Stuff I made out of Wood</h1>
+        <div className="brand">
+          <img className="brand-logo" src="logo.svg" alt="" width="40" height="40" />
+          <h1>Stuff I made out of Wood</h1>
+        </div>
         <input
           className="search"
           type="search"
