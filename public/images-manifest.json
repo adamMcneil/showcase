@@ -1,6 +1,7 @@
 [
   {
     "dir": "Disc Stand",
+    "assetFolder": "images/disc-stand",
     "added": "2026-11-16T19:36:38",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20261117_013638140_ukajm7?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261117_013638140_ukajm7?_a=BAMAOGfk0",
@@ -21,6 +22,7 @@
   },
   {
     "dir": "Walnut Standing Desk",
+    "assetFolder": "images/walnut-standing-desk",
     "added": "2026-10-20T17:18:10",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20261020_221810206_jkwtnb?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261020_221810206_jkwtnb?_a=BAMAOGfk0",
@@ -43,6 +45,7 @@
   },
   {
     "dir": "Mary Sign",
+    "assetFolder": "images/mary-sign",
     "added": "2026-10-15T21:18:18",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20261016_021818969_siw7ej?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261016_021818969_siw7ej?_a=BAMAOGfk0",
@@ -57,6 +60,7 @@
   },
   {
     "dir": "End Grain Cutting Board",
+    "assetFolder": "images/end-grain-cutting-board",
     "added": "2026-09-26T20:43:08",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260927_014308432_txmr0c?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260927_014308432_txmr0c?_a=BAMAOGfk0",
@@ -75,6 +79,7 @@
   },
   {
     "dir": "Hackberry Bookshelf",
+    "assetFolder": "images/hackberry-bookshelf",
     "added": "2026-09-19T19:31:33",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260920_003133172_zevj0h?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260920_003133172_zevj0h?_a=BAMAOGfk0",
@@ -93,6 +98,7 @@
   },
   {
     "dir": "Weird Standing Desk",
+    "assetFolder": "images/weird-standing-desk",
     "added": "2026-09-19T16:00:21",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260919_210021793_vdeefu?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260919_210021793_vdeefu?_a=BAMAOGfk0",
@@ -113,6 +119,7 @@
   },
   {
     "dir": "Katelyns Duck",
+    "assetFolder": "images/katelyns-duck",
     "added": "2026-09-05T09:14:14",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260905_141414884_ot7ryb?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260905_141414884_ot7ryb?_a=BAMAOGfk0",
@@ -131,6 +138,7 @@
   },
   {
     "dir": "Megs Bench White Oak",
+    "assetFolder": "images/megs-bench-white-oak",
     "added": "2026-09-03T20:07:17",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260904_010717933_ajwx68?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260904_010717933_ajwx68?_a=BAMAOGfk0",
@@ -151,6 +159,7 @@
   },
   {
     "dir": "Crusader Cross",
+    "assetFolder": "images/crusader-cross",
     "added": "2026-09-02T16:26:12",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260902_212612185_b4poa7?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260902_212612185_b4poa7?_a=BAMAOGfk0",
@@ -175,6 +184,7 @@
   },
   {
     "dir": "Cherry Standing Desk",
+    "assetFolder": "images/cherry-standing-desk",
     "added": "2026-08-21T18:44:46",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260821_234446311_pbhr54?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260821_234446311_pbhr54?_a=BAMAOGfk0",
@@ -197,6 +207,7 @@
   },
   {
     "dir": "Walnut Trim Bench",
+    "assetFolder": "images/walnut-trim-bench",
     "added": "2026-08-21T17:54:33",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260821_225433972_jkkfey?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260821_225433972_jkkfey?_a=BAMAOGfk0",
@@ -219,6 +230,7 @@
   },
   {
     "dir": "Cherry Stool",
+    "assetFolder": "images/cherry-stool",
     "added": "2026-08-03T17:27:21",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260803_222721183_pq1sgb?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260803_222721183_pq1sgb?_a=BAMAOGfk0",
@@ -235,6 +247,7 @@
   },
   {
     "dir": "Ayden Coasters",
+    "assetFolder": "images/ayden-coasters",
     "added": "2026-08-01T13:09:28",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260801_180928773_pfrlv6?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260801_180928773_pfrlv6?_a=BAMAOGfk0",
@@ -251,6 +264,7 @@
   },
   {
     "dir": "Baptism Crosses",
+    "assetFolder": "images/baptism crosses",
     "added": "2026-07-24T21:34:06",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/baptism_crosses_f2uelf?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/baptism_crosses_f2uelf?_a=BAMAOGfk0",
@@ -263,6 +277,7 @@
   },
   {
     "dir": "Maple Mantle",
+    "assetFolder": "images/maple-mantle",
     "added": "2026-06-16T18:09:57",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260616_230957753_x1iuzg?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260616_230957753_x1iuzg?_a=BAMAOGfk0",
@@ -277,6 +292,7 @@
   },
   {
     "dir": "Marys Car",
+    "assetFolder": "images/marys-car",
     "added": "2026-04-10T20:52:11",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260411_015211952_qrohrf?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260411_015211952_qrohrf?_a=BAMAOGfk0",
@@ -295,6 +311,7 @@
   },
   {
     "dir": "White Oak Standing Desk",
+    "assetFolder": "images/white-oak-standing-desk",
     "added": "2026-04-01T18:24:11",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260401_232411991_h3x9go?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260401_232411991_h3x9go?_a=BAMAOGfk0",
@@ -317,6 +334,7 @@
   },
   {
     "dir": "Dads Standing Desk",
+    "assetFolder": "images/dads-standing-desk",
     "added": "2026-03-21T06:22:44",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260321_112244650_hcsrqw?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260321_112244650_hcsrqw?_a=BAMAOGfk0",
@@ -331,6 +349,7 @@
   },
   {
     "dir": "Fixed Cutting Board",
+    "assetFolder": "images/fixed-cutting-board",
     "added": "2026-03-21T06:16:11",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260321_111611689_swmvkz?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260321_111611689_swmvkz?_a=BAMAOGfk0",
@@ -347,6 +366,7 @@
   },
   {
     "dir": "Table",
+    "assetFolder": "images/table",
     "added": "2026-03-21T01:16:32Z",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_jux3sv?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_jux3sv?_a=BAMAOGfk0",
@@ -359,6 +379,7 @@
   },
   {
     "dir": "Luke's Sign",
+    "assetFolder": "images/lukes-sign",
     "added": "2026-03-21T01:15:28Z",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/4499255079334851761.jpg_qkect1?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/4499255079334851761.jpg_qkect1?_a=BAMAOGfk0",
@@ -373,6 +394,7 @@
   },
   {
     "dir": "Maple Coffee Table",
+    "assetFolder": "images/maple-coffee-table",
     "added": "2026-02-24T18:50:38",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260225_005038993_vohpdf?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260225_005038993_vohpdf?_a=BAMAOGfk0",
@@ -391,6 +413,7 @@
   },
   {
     "dir": "White Oak Side Table",
+    "assetFolder": "images/white-oak-side-table",
     "added": "2026-02-24T16:52:49",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260224_225249125_tesnqe?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260224_225249125_tesnqe?_a=BAMAOGfk0",
@@ -411,6 +434,7 @@
   },
   {
     "dir": "New Catan",
+    "assetFolder": "images/new-catan",
     "added": "2026-02-20T18:10:16",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260221_001016319_qekmn7?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260221_001016319_qekmn7?_a=BAMAOGfk0",
@@ -427,6 +451,7 @@
   },
   {
     "dir": "Fancy Cajón",
+    "assetFolder": "images/fancy-cajon",
     "added": "2026-02-07T12:07:34",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260207_180734589_m7ak5t?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260207_180734589_m7ak5t?_a=BAMAOGfk0",
@@ -449,6 +474,7 @@
   },
   {
     "dir": "Callahans Truck",
+    "assetFolder": "images/callahans-truck",
     "added": "2026-01-29T20:03:30",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260130_020330412_ufykew?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260130_020330412_ufykew?_a=BAMAOGfk0",
@@ -463,6 +489,7 @@
   },
   {
     "dir": "Bookmarks",
+    "assetFolder": "images/bookmarks",
     "added": "2026-01-21T17:59:31",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260121_235931777_ffsxao?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260121_235931777_ffsxao?_a=BAMAOGfk0",
@@ -475,6 +502,7 @@
   },
   {
     "dir": "Kids' Cups",
+    "assetFolder": "images/kids-cups",
     "added": "2026-01-20T17:06:53",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260120_230653596_mvzs3j?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260120_230653596_mvzs3j?_a=BAMAOGfk0",
@@ -487,6 +515,7 @@
   },
   {
     "dir": "Random Box",
+    "assetFolder": "images/random-box",
     "added": "2026-01-19T17:26:22",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260119_232622325_g4se0d?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260119_232622325_g4se0d?_a=BAMAOGfk0",
@@ -501,6 +530,7 @@
   },
   {
     "dir": "Mother's Cutting Board",
+    "assetFolder": "images/mothers-cutting-board",
     "added": "2026-01-19T17:19:53",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260119_231953660_fibxbo?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260119_231953660_fibxbo?_a=BAMAOGfk0",
@@ -513,6 +543,7 @@
   },
   {
     "dir": "Pencil Holder",
+    "assetFolder": "images/pencil-holder",
     "added": "2026-01-19T17:18:40",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260119_231840438_kebcwm?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260119_231840438_kebcwm?_a=BAMAOGfk0",
@@ -527,6 +558,7 @@
   },
   {
     "dir": "Ben's Knife",
+    "assetFolder": "images/bens-knife",
     "added": "2026-01-19T17:09:48",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260119_230948359_mq7gyq?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260119_230948359_mq7gyq?_a=BAMAOGfk0",
@@ -539,6 +571,7 @@
   },
   {
     "dir": "One Shelf Bookshelf",
+    "assetFolder": "images/one-shelf-bookshelf",
     "added": "2026-01-18T07:31:27",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_qwa9nq?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_qwa9nq?_a=BAMAOGfk0",
@@ -557,6 +590,7 @@
   },
   {
     "dir": "Kids' Bookshelf",
+    "assetFolder": "images/kids-bookself",
     "added": "2026-01-17T16:07:11",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260117_220711732_vkfdhp?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260117_220711732_vkfdhp?_a=BAMAOGfk0",
@@ -573,6 +607,7 @@
   },
   {
     "dir": "Scrabble Name Board",
+    "assetFolder": "images/scrabble-name-board",
     "added": "2026-01-02T21:46:07",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260103_034607236_h8nfuz?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260103_034607236_h8nfuz?_a=BAMAOGfk0",
@@ -587,6 +622,7 @@
   },
   {
     "dir": "Allison's Bookshelf",
+    "assetFolder": "images/allisons-bookshelf",
     "added": "2026-01-01T20:22:47",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/allison-shelf_zhnvtt?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/allison-shelf_zhnvtt?_a=BAMAOGfk0",
@@ -599,6 +635,7 @@
   },
   {
     "dir": "Gwen's Staff",
+    "assetFolder": "images/gwens-staff",
     "added": "2025-12-25T15:41:21",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20251225_214121993_sfumdx?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20251225_214121993_sfumdx?_a=BAMAOGfk0",
@@ -613,6 +650,7 @@
   },
   {
     "dir": "Isaiah's Sword",
+    "assetFolder": "images/isaiahs-sword",
     "added": "2025-12-25T15:40:47",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/isaiahs-sword_cqzzzu?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/isaiahs-sword_cqzzzu?_a=BAMAOGfk0",
@@ -625,6 +663,7 @@
   },
   {
     "dir": "John's Knife",
+    "assetFolder": "images/johns-knife",
     "added": "2025-12-16T19:53:46",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/IMG_20251216_195344050_ik8sqe?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/IMG_20251216_195344050_ik8sqe?_a=BAMAOGfk0",
@@ -643,6 +682,7 @@
   },
   {
     "dir": "Meredith's Cutting Board",
+    "assetFolder": "images/meredith-cutting-board",
     "added": "2025-12-15T20:00:13",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/IMG_20251215_200011355_pcxnfl?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/IMG_20251215_200011355_pcxnfl?_a=BAMAOGfk0",
@@ -657,6 +697,7 @@
   },
   {
     "dir": "Luke's Standing Desk",
+    "assetFolder": "images/lukes-standing-desk",
     "added": "2025-11-26T13:37:20",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_brj49f?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_brj49f?_a=BAMAOGfk0",
@@ -673,6 +714,7 @@
   },
   {
     "dir": "Ukulele",
+    "assetFolder": "images/ukulele",
     "added": "2025-11-03T17:19:25",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_bvwkwo?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_bvwkwo?_a=BAMAOGfk0",
@@ -699,6 +741,7 @@
   },
   {
     "dir": "Austin Wedding Sign",
+    "assetFolder": "images/austin-wedding-sign",
     "added": "2025-10-25T08:04:36",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/IMG_20251025_080434189_HDR_ur7wji?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/IMG_20251025_080434189_HDR_ur7wji?_a=BAMAOGfk0",
@@ -715,6 +758,7 @@
   },
   {
     "dir": "David's Workbench",
+    "assetFolder": "images/davids-workbench",
     "added": "2025-10-18T12:24:51",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_d9ktl0?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_d9ktl0?_a=BAMAOGfk0",
@@ -729,6 +773,7 @@
   },
   {
     "dir": "Box",
+    "assetFolder": "images/box",
     "added": "2025-10-17T18:05:54",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_ntloaz?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_ntloaz?_a=BAMAOGfk0",
@@ -751,6 +796,7 @@
   },
   {
     "dir": "Meg's End Table",
+    "assetFolder": "images/megs-end-table",
     "added": "2025-09-30T21:01:49",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/IMG_20250930_210147743_iiq71x?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/IMG_20250930_210147743_iiq71x?_a=BAMAOGfk0",
@@ -767,6 +813,7 @@
   },
   {
     "dir": "David's Bookshelf",
+    "assetFolder": "images/davids-bookshelf",
     "added": "2025-09-13T19:39:36",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/IMG_20250913_193934862_cvcigq?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/IMG_20250913_193934862_cvcigq?_a=BAMAOGfk0",
@@ -781,6 +828,7 @@
   },
   {
     "dir": "Chess Board",
+    "assetFolder": "images/chess-board",
     "added": "2025-09-05T20:50:40",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_obkmzr?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_obkmzr?_a=BAMAOGfk0",
@@ -803,6 +851,7 @@
   },
   {
     "dir": "Ben's Table",
+    "assetFolder": "images/bens-table",
     "added": "2025-06-19T19:44:37",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_ggfe69?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_ggfe69?_a=BAMAOGfk0",
@@ -823,6 +872,7 @@
   },
   {
     "dir": "Guitar Holders",
+    "assetFolder": "images/guitar-holders",
     "added": "2025-06-17T12:20:04",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_efi8br?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_efi8br?_a=BAMAOGfk0",
@@ -841,6 +891,7 @@
   },
   {
     "dir": "First Cajón",
+    "assetFolder": "images/first-cajon",
     "added": "2025-06-16T13:08:24",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_zy8vmv?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_zy8vmv?_a=BAMAOGfk0",
@@ -861,6 +912,7 @@
   },
   {
     "dir": "Catan Board",
+    "assetFolder": "images/catan",
     "added": "2025-06-13T15:44:43",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_wm4skx?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_wm4skx?_a=BAMAOGfk0",
@@ -941,6 +993,7 @@
   },
   {
     "dir": "Meg's Bench",
+    "assetFolder": "images/megs-bench",
     "added": "2025-05-24T11:39:54",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_xoleas?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_xoleas?_a=BAMAOGfk0",
@@ -955,6 +1008,7 @@
   },
   {
     "dir": "First Box",
+    "assetFolder": "images/first-box",
     "added": "2025-05-23T18:08:49",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_zwim9c?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_zwim9c?_a=BAMAOGfk0",
@@ -971,6 +1025,7 @@
   },
   {
     "dir": "Kitchen Island",
+    "assetFolder": "images/island",
     "added": "2025-05-23T13:27:55",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_vqvbag?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_vqvbag?_a=BAMAOGfk0",
@@ -983,6 +1038,7 @@
   },
   {
     "dir": "Pine Bench",
+    "assetFolder": "images/pine-bench",
     "added": "2025-05-23T13:27:35",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_ltlzvi?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_ltlzvi?_a=BAMAOGfk0",
@@ -997,6 +1053,7 @@
   },
   {
     "dir": "Basket Stand",
+    "assetFolder": "images/basket-stand",
     "added": "2025-05-23T08:28:00",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_st4e4e?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_st4e4e?_a=BAMAOGfk0",
@@ -1011,6 +1068,7 @@
   },
   {
     "dir": "First Live Edge",
+    "assetFolder": "images/first-live-edge",
     "added": "2025-05-22T17:04:35",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_wxsue6?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_wxsue6?_a=BAMAOGfk0",
@@ -1023,6 +1081,7 @@
   },
   {
     "dir": "End Table",
+    "assetFolder": "images/end-table",
     "added": "2025-05-22T17:04:21",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_w3rhtv?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_w3rhtv?_a=BAMAOGfk0",
@@ -1037,6 +1096,7 @@
   },
   {
     "dir": "Small Bookshelf",
+    "assetFolder": "images/small-bookself",
     "added": "2025-05-22T17:02:48",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_hksxoa?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_hksxoa?_a=BAMAOGfk0",
@@ -1051,6 +1111,7 @@
   },
   {
     "dir": "Cherry Bench",
+    "assetFolder": "images/cherry-bench",
     "added": "2025-05-22T16:14:23",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_jhcrx4?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_jhcrx4?_a=BAMAOGfk0",
@@ -1065,6 +1126,7 @@
   },
   {
     "dir": "Walnut Bookshelf",
+    "assetFolder": "images/walnut-bookself",
     "added": "2025-05-17T07:29:59",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/0_v76bak?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/0_v76bak?_a=BAMAOGfk0",
@@ -1083,6 +1145,7 @@
   },
   {
     "dir": "Milling",
+    "assetFolder": "images/milling",
     "added": "2024-12-30T18:24:52",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/first_uh8vxu?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/first_uh8vxu?_a=BAMAOGfk0",
@@ -1105,6 +1168,7 @@
   },
   {
     "dir": "TV Stand",
+    "assetFolder": "images/tv-stand",
     "added": "2024-01-05T11:49:47",
     "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/IMG_20240105_114946941_cueqmb?_a=BAMAOGfk0",
     "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/IMG_20240105_114946941_cueqmb?_a=BAMAOGfk0",
