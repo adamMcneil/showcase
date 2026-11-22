@@ -68,14 +68,15 @@ async function fromCloudinary(nameOverrides) {
       const [, folder] = parts
       // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
       const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
-      assets.push({ folder, name, public_id: r.public_id, created_at: r.created_at })
+      assets.push({ folder, assetFolder, name, public_id: r.public_id, created_at: r.created_at })
     }
     nextCursor = res.next_cursor
   } while (nextCursor)
 
-  // EXIF is only exposed by the per-asset details endpoint, so fetch it for
-  // each asset (a few at a time) and prefer the date the photo was taken,
-  // falling back to upload date when EXIF is missing.
+  // EXIF and context are only exposed by the per-asset details endpoint, so
+  // fetch them for each asset (a few at a time). Prefer the EXIF date the photo
+  // was taken, then the Google Photos date saved by the uploader, then the
+  // upload date.
   console.log(`Fetching EXIF dates for ${assets.length} assets...`)
   const CONCURRENCY = 10
   for (let i = 0; i < assets.length; i += CONCURRENCY) {
@@ -87,7 +88,9 @@ async function fromCloudinary(nameOverrides) {
           )
         )
         const meta = details.image_metadata ?? {}
-        a.taken = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate) ?? a.created_at
+        const context = details.context?.custom ?? {}
+        a.taken = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate) ?? context.taken ?? a.created_at
+        a.product = context.product
       })
     )
   }
@@ -105,8 +108,10 @@ async function fromCloudinary(nameOverrides) {
     const firstItem = items.find(i => i.name.toLowerCase() === 'first') ?? items[0]
     // Date of the folder = earliest photo taken in it
     const added = items[0].taken
+    const product = items.find(i => i.product)?.product
     result.push({
-      dir: nameOverrides[folder] ?? toTitle(folder),
+      dir: nameOverrides[folder] ?? product ?? toTitle(folder),
+      assetFolder: items[0].assetFolder,
       added,
       thumb: thumb(firstItem.public_id),
       first: full(firstItem.public_id),

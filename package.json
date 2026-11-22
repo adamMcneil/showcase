@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "upload": "node scripts/upload-to-cloudinary.js",
-    "generate-manifest": "node scripts/generate-manifest.js"
+    "generate-manifest": "node scripts/generate-manifest.js",
+    "test": "node --test \"worker/test/*.test.js\""
   },
   "dependencies": {
     "react": "^19.0.0",

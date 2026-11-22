@@ -1,0 +1,10 @@
+name = "showcase-uploader"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+
+# Secrets (set by .github/workflows/deploy-worker.yml from GitHub secrets/variables):
+#   GOOGLE_CLIENT_ID, OWNER_EMAIL, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY,
+#   CLOUDINARY_API_SECRET, GH_DISPATCH_TOKEN
+[vars]
+ALLOWED_ORIGINS = "https://adammcneil.github.io,http://localhost:5173,http://localhost:4173"
+GITHUB_REPO = "adamMcneil/showcase"

@@ -2,6 +2,9 @@ name: Update Image Manifest
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [scripts/generate-manifest.js]
 
 permissions:
   contents: write
