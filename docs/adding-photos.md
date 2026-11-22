@@ -25,7 +25,8 @@ Uploader Worker (Cloudflare, worker/)
 - Google only lets apps read photos you pick, and its download links last an hour and need your Google token, so each photo is copied to Cloudinary when you pick it. Google Photos stays the original.
 - The Worker exists because browsers can't download from Google's photo links. It never stores your Google token. It accepts requests only from your Google account (`OWNER_EMAIL`).
 - The manifest still comes from Cloudinary folders. New projects store their display name on the photos (Cloudinary context `product`), so `folders.json` is only needed to rename a project.
-- The date shown is the camera date from the photo, or the Google Photos date if the photo has none.
+- Photos added here are dated by Google Photos; photos uploaded straight to Cloudinary use their camera (EXIF) date.
+- Cloudinary's free plan allows 500 Admin API calls an hour. The manifest script reuses the dates already in `public/images-manifest.json` and only looks up photos it hasn't seen, so a run costs one or two calls.
 
 Still done in Cloudinary or `folders.json`: removing a photo, choosing the cover (name it `first`), renaming a project.
 

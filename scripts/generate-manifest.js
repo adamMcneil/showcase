@@ -31,6 +31,21 @@ function toTitle(folder) {
 
 // ── Cloudinary ────────────────────────────────────────────────────────────────
 
+// Dates already worked out for photos on the site, keyed by Cloudinary public
+// ID. Reusing them keeps each run to a couple of Admin API calls; the free
+// plan allows 500 per hour, and one details call per photo used up half of it.
+function loadKnownDates() {
+  if (!fs.existsSync(outFile)) return {}
+  const known = {}
+  for (const entry of JSON.parse(fs.readFileSync(outFile, 'utf8'))) {
+    (entry.files ?? []).forEach((url, i) => {
+      const m = /\/upload\/[^/]+\/([^?]+)/.exec(url)
+      if (m && entry.dates?.[i]) known[decodeURIComponent(m[1])] = entry.dates[i]
+    })
+  }
+  return known
+}
+
 async function fromCloudinary(nameOverrides) {
   const cloudinary = require('cloudinary').v2
   cloudinary.config({
@@ -56,7 +71,7 @@ async function fromCloudinary(nameOverrides) {
   let nextCursor
   do {
     const res = await new Promise((resolve, reject) =>
-      cloudinary.api.resources({ max_results: 500, next_cursor: nextCursor }, (err, r) =>
+      cloudinary.api.resources({ max_results: 500, context: true, next_cursor: nextCursor }, (err, r) =>
         err ? reject(err) : resolve(r)
       )
     )
@@ -68,29 +83,41 @@ async function fromCloudinary(nameOverrides) {
       const [, folder] = parts
       // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
       const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
-      assets.push({ folder, assetFolder, name, public_id: r.public_id, created_at: r.created_at })
+      const context = r.context?.custom ?? r.context ?? {}
+      assets.push({
+        folder,
+        assetFolder,
+        name,
+        public_id: r.public_id,
+        created_at: r.created_at,
+        taken: context.taken,
+        product: context.product,
+      })
     }
     nextCursor = res.next_cursor
   } while (nextCursor)
 
-  // EXIF and context are only exposed by the per-asset details endpoint, so
-  // fetch them for each asset (a few at a time). Prefer the EXIF date the photo
-  // was taken, then the Google Photos date saved by the uploader, then the
-  // upload date.
-  console.log(`Fetching EXIF dates for ${assets.length} assets...`)
+  // Photo date: the one already on the site, else the Google Photos date saved
+  // by the uploader, else the EXIF date from the per-asset details endpoint
+  // (one API call each), else the upload date.
+  const known = loadKnownDates()
+  const unknown = []
+  for (const a of assets) {
+    a.taken = known[a.public_id] ?? a.taken
+    if (!a.taken) unknown.push(a)
+  }
+  console.log(`${assets.length} assets, fetching EXIF dates for ${unknown.length} new ones...`)
   const CONCURRENCY = 10
-  for (let i = 0; i < assets.length; i += CONCURRENCY) {
+  for (let i = 0; i < unknown.length; i += CONCURRENCY) {
     await Promise.all(
-      assets.slice(i, i + CONCURRENCY).map(async a => {
+      unknown.slice(i, i + CONCURRENCY).map(async a => {
         const details = await new Promise((resolve, reject) =>
           cloudinary.api.resource(a.public_id, { image_metadata: true }, (err, r) =>
             err ? reject(err) : resolve(r)
           )
         )
         const meta = details.image_metadata ?? {}
-        const context = details.context?.custom ?? {}
-        a.taken = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate) ?? context.taken ?? a.created_at
-        a.product = context.product
+        a.taken = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate) ?? a.created_at
       })
     )
   }
