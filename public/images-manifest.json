@@ -44,6 +44,19 @@
     ]
   },
   {
+    "dir": "chicken",
+    "assetFolder": "images/chicken",
+    "added": "2026-10-19T12:13:36",
+    "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20261019_171336206_d42861c2?_a=BAMAOGfk0",
+    "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261019_171336206_d42861c2?_a=BAMAOGfk0",
+    "files": [
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261019_171336206_d42861c2?_a=BAMAOGfk0"
+    ],
+    "dates": [
+      "2026-10-19T12:13:36"
+    ]
+  },
+  {
     "dir": "test",
     "assetFolder": "images/test",
     "added": "2026-10-17T12:28:23",
