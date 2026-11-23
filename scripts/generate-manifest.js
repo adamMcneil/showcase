@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Generates images-manifest.json.
+// Generates public/images-manifest.json.
 //
-// Cloudinary mode: queries all folders under showcase/ automatically.
+// Cloudinary mode: lists every project folder under the root (e.g. images/).
 //   folders.json is optional — use it to override display names.
 //
 // Local mode: scans all subdirectories of images/.
@@ -31,22 +31,11 @@ function toTitle(folder) {
 
 // ── Cloudinary ────────────────────────────────────────────────────────────────
 
-// Dates already worked out for photos on the site, keyed by Cloudinary public
-// ID. Reusing them keeps each run to a couple of Admin API calls; the free
-// plan allows 500 per hour, and one details call per photo used up half of it.
-function loadKnownDates() {
-  if (!fs.existsSync(outFile)) return {}
-  const known = {}
-  for (const entry of JSON.parse(fs.readFileSync(outFile, 'utf8'))) {
-    (entry.files ?? []).forEach((url, i) => {
-      const m = /\/upload\/[^/]+\/([^?]+)/.exec(url)
-      if (m && entry.dates?.[i]) known[decodeURIComponent(m[1])] = entry.dates[i]
-    })
-  }
-  return known
-}
-
+// The site reads the manifest live from the uploader Worker (GET /manifest);
+// this static copy is what it falls back to. Both are built by
+// worker/src/manifest.js, so they agree on hidden photos, names and dates.
 async function fromCloudinary(nameOverrides) {
+  const { buildManifest, exifToIso, knownDates, undated } = await import('../worker/src/manifest.js')
   const cloudinary = require('cloudinary').v2
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -54,20 +43,7 @@ async function fromCloudinary(nameOverrides) {
     api_secret: process.env.CLOUDINARY_API_SECRET,
   })
 
-  const thumb = id => cloudinary.url(id, {
-    secure: true,
-    transformation: [{ width: 600, fetch_format: 'auto', quality: 'auto' }],
-  })
-  const full = id => cloudinary.url(id, { secure: true, fetch_format: 'auto', quality: 'auto' })
-
-  // EXIF dates look like "2026:04:11 01:53:08" — convert to ISO for sorting/display
-  const exifToIso = s => {
-    const m = /^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}:\d{2}:\d{2})/.exec(s ?? '')
-    return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}` : null
-  }
-
-  // Fetch all resources using dynamic folder mode (asset_folder grouping)
-  const found = [] // { folder, name, public_id, created_at, tags }
+  const resources = []
   let nextCursor
   do {
     const res = await new Promise((resolve, reject) =>
@@ -75,90 +51,33 @@ async function fromCloudinary(nameOverrides) {
         err ? reject(err) : resolve(r)
       )
     )
-    for (const r of res.resources) {
-      const assetFolder = r.asset_folder ?? ''
-      // Only include assets one level under the root folder (e.g. images/<folder>)
-      const parts = assetFolder.split('/')
-      if (parts.length !== 2) continue
-      const [, folder] = parts
-      // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
-      const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
-      const context = r.context?.custom ?? r.context ?? {}
-      found.push({
-        folder,
-        assetFolder,
-        name,
-        public_id: r.public_id,
-        created_at: r.created_at,
-        taken: context.taken,
-        product: context.product,
-        tags: r.tags ?? [],
-      })
-    }
+    resources.push(...res.resources)
     nextCursor = res.next_cursor
   } while (nextCursor)
 
-  // Hidden on the admin page (tags set by worker/src/index.js): a photo tagged
-  // "hidden", and every photo of a project where any photo is tagged
-  // "hidden-project". They stay in Cloudinary.
-  const hiddenFolders = new Set(found.filter(a => a.tags.includes('hidden-project')).map(a => a.folder))
-  const assets = found.filter(a => !a.tags.includes('hidden') && !hiddenFolders.has(a.folder))
-  if (assets.length < found.length) {
-    console.log(`Leaving out ${found.length - assets.length} hidden photos (${hiddenFolders.size} hidden projects)`)
-  }
-
-  // Photo date: the one already on the site, else the Google Photos date saved
-  // by the uploader, else the EXIF date from the per-asset details endpoint
-  // (one API call each), else the upload date.
-  const known = loadKnownDates()
-  const unknown = []
-  for (const a of assets) {
-    a.taken = known[a.public_id] ?? a.taken
-    if (!a.taken) unknown.push(a)
-  }
-  console.log(`${assets.length} assets, fetching EXIF dates for ${unknown.length} new ones...`)
+  // Photo date: the one already in this file, else the Google Photos date saved
+  // by the uploader, else the camera (EXIF) date, else the upload date. EXIF
+  // costs one Admin API call per photo and the free plan allows 500 an hour, so
+  // dates already worked out are reused.
+  const known = fs.existsSync(outFile) ? knownDates(JSON.parse(fs.readFileSync(outFile, 'utf8'))) : {}
+  const missing = undated(resources, known)
+  console.log(`${resources.length} assets, fetching EXIF dates for ${missing.length} new ones...`)
+  const exif = {}
   const CONCURRENCY = 10
-  for (let i = 0; i < unknown.length; i += CONCURRENCY) {
+  for (let i = 0; i < missing.length; i += CONCURRENCY) {
     await Promise.all(
-      unknown.slice(i, i + CONCURRENCY).map(async a => {
+      missing.slice(i, i + CONCURRENCY).map(async id => {
         const details = await new Promise((resolve, reject) =>
-          cloudinary.api.resource(a.public_id, { image_metadata: true }, (err, r) =>
-            err ? reject(err) : resolve(r)
-          )
+          cloudinary.api.resource(id, { image_metadata: true }, (err, r) => (err ? reject(err) : resolve(r)))
         )
         const meta = details.image_metadata ?? {}
-        a.taken = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate) ?? a.created_at
+        const date = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate)
+        if (date) exif[id] = date
       })
     )
   }
 
-  const groups = {} // folder -> [{ name, public_id, taken }]
-  for (const a of assets) {
-    if (!groups[a.folder]) groups[a.folder] = []
-    groups[a.folder].push(a)
-  }
-
-  const result = []
-  for (const [folder, items] of Object.entries(groups)) {
-    // Oldest photo first within a folder
-    items.sort((a, b) => a.taken.localeCompare(b.taken))
-    const firstItem = items.find(i => i.name.toLowerCase() === 'first') ?? items[0]
-    // Date of the folder = earliest photo taken in it
-    const added = items[0].taken
-    const product = items.find(i => i.product)?.product
-    result.push({
-      dir: nameOverrides[folder] ?? product ?? toTitle(folder),
-      assetFolder: items[0].assetFolder,
-      added,
-      thumb: thumb(firstItem.public_id),
-      first: full(firstItem.public_id),
-      files: items.map(i => full(i.public_id)),
-      dates: items.map(i => i.taken),
-    })
-  }
-
-  // Newest folders first
-  return result.sort((a, b) => b.added.localeCompare(a.added))
+  return buildManifest(resources, { cloud: process.env.CLOUDINARY_CLOUD_NAME, names: nameOverrides, known, exif })
 }
 
 // ── Local fallback ────────────────────────────────────────────────────────────

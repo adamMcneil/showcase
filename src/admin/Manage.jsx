@@ -96,7 +96,7 @@ export default function Manage({ token, onError, clearError }) {
     setSelected(new Set())
     const done = describe(result)
     setNotice(done)
-    if (await updateSite()) setNotice(`${done} The site updates in about 2–3 minutes.`)
+    if (await updateSite()) setNotice(`${done} The site is up to date.`)
   }
 
   function toggleProjectHidden() {

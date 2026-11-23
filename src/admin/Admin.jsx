@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { sized } from '../lib/cloudinary'
+import { loadManifest } from '../lib/manifest'
 import {
   SignInExpired,
   createSession,
@@ -64,16 +65,32 @@ function modeFromHash() {
   return window.location.hash === '#manage' ? 'manage' : 'add'
 }
 
+// A Google Photos picking session saved before a reload, unless it has expired
+// (its link would open a Google Photos page that never shows any photos).
+function savedSession() {
+  const s = load(PENDING_KEY)?.session
+  if (!s) return null
+  return s.expireTime && Date.parse(s.expireTime) - Date.now() < 2 * 60_000 ? null : s
+}
+
+// How many times in a row checking the picking session may fail (a dropped
+// connection, a Google hiccup) before the page stops and offers to start over.
+const MAX_POLL_FAILURES = 4
+
 export default function Admin() {
   const [mode, setMode] = useState(modeFromHash)
   const [auth, setAuth] = useState(storedAuth)
   const [error, setError] = useState(null)
   const [projects, setProjects] = useState(null)
   const [target, setTarget] = useState(() => load(PENDING_KEY)?.target ?? null)
-  const [session, setSession] = useState(() => load(PENDING_KEY)?.session ?? null)
+  const [session, setSession] = useState(savedSession)
   const [photos, setPhotos] = useState(null) // [{ item, status, url, error }]
   const [skipped, setSkipped] = useState(0)
   const [publishing, setPublishing] = useState(null) // null | 'working' | 'done'
+  // Picking stopped on an error and needs a fresh session. Kept apart from
+  // `error`, which switching tabs clears, so the page never shows "Waiting for
+  // your picks…" while nothing is checking for them.
+  const [pickStalled, setPickStalled] = useState(false)
 
   const step = !auth ? 'signin' : !target ? 'choose' : !photos ? 'pick' : publishing === 'done' ? 'done' : 'copy'
 
@@ -96,33 +113,44 @@ export default function Admin() {
 
   useEffect(() => {
     if (!auth || projects) return
-    fetch(`${SITE_URL}images-manifest.json`, { cache: 'no-store' })
-      .then(r => (r.ok ? r.json() : Promise.reject(new Error('Could not load the project list'))))
+    loadManifest()
       .then(setProjects)
-      .catch(e => setError(e.message))
+      .catch(() => setError('Could not load the project list'))
   }, [auth, projects])
 
   useEffect(() => {
-    if (!auth || !target || session || photos) return
+    if (!auth || !target || session || photos || pickStalled) return
     let cancelled = false
     createSession(auth.token)
       .then(s => {
         if (cancelled) return deleteSession(auth.token, s.id)
-        const next = { id: s.id, pickerUri: s.pickerUri }
+        const next = { id: s.id, pickerUri: s.pickerUri, expireTime: s.expireTime }
         save(PENDING_KEY, { target, session: next })
         setSession(next)
       })
-      .catch(e => !cancelled && fail(e))
+      .catch(e => {
+        if (cancelled) return
+        setPickStalled(true)
+        fail(e)
+      })
     return () => {
       cancelled = true
     }
-  }, [auth, target, session, photos])
+  }, [auth, target, session, photos, pickStalled])
 
   useEffect(() => {
-    if (!auth || !target || !session || photos) return
+    if (!auth || !target || !session || photos || pickStalled) return
     let stopped = false
     let busy = false
+    let failures = 0
     let timer
+
+    function giveUp(e) {
+      stopped = true
+      clearTimeout(timer)
+      setPickStalled(true)
+      fail(e)
+    }
 
     async function poll() {
       if (busy || stopped) return
@@ -131,14 +159,22 @@ export default function Admin() {
       try {
         const s = await getSession(auth.token, session.id)
         if (stopped) return
+        failures = 0
         if (s.mediaItemsSet) {
           const items = await listPicked(auth.token, session.id)
           if (!stopped) startCopy(auth.token, target, session, items)
           return
         }
+        if (s.expireTime && Date.parse(s.expireTime) <= Date.now()) {
+          giveUp(new Error('The Google Photos session expired before any photos were picked.'))
+          return
+        }
         timer = setTimeout(poll, seconds(s.pollingConfig?.pollInterval, 3) * 1000)
       } catch (e) {
-        if (!stopped) fail(e)
+        if (stopped) return
+        failures++
+        if (e instanceof SignInExpired || failures >= MAX_POLL_FAILURES) giveUp(e)
+        else timer = setTimeout(poll, 2 ** failures * 1000)
       } finally {
         busy = false
       }
@@ -155,7 +191,7 @@ export default function Admin() {
       clearTimeout(timer)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [auth, target, session, photos])
+  }, [auth, target, session, photos, pickStalled])
 
   async function handleSignIn() {
     setError(null)
@@ -183,6 +219,7 @@ export default function Admin() {
     setPhotos(null)
     setSkipped(0)
     setPublishing(null)
+    setPickStalled(false)
     setError(null)
   }
 
@@ -203,6 +240,7 @@ export default function Admin() {
     setSession(null)
     setPhotos(null)
     setSkipped(0)
+    setPickStalled(false)
     setError(null)
   }
 
@@ -316,7 +354,7 @@ export default function Admin() {
       ) : step === 'choose' ? (
         <ProjectChooser projects={projects} onChoose={chooseProject} />
       ) : step === 'pick' ? (
-        <PickStep target={target} session={session} error={error} onCancel={cancelPicking} onRestart={pickAgain} />
+        <PickStep target={target} session={session} stalled={pickStalled} onCancel={cancelPicking} onRestart={pickAgain} />
       ) : step === 'copy' ? (
         <CopyStep
           target={target}
@@ -333,7 +371,7 @@ export default function Admin() {
           <h2>Done</h2>
           <p>
             Added {plural(photos.filter(p => p.status === 'done').length, 'photo')} to <strong>{target.name}</strong>
-            {skipped > 0 && ` (skipped ${plural(skipped, 'video')})`}. The site shows them in about 2–3 minutes.
+            {skipped > 0 && ` (skipped ${plural(skipped, 'video')})`}. They're on the site now.
           </p>
           <PhotoGrid photos={photos} />
           <div className="actions">
@@ -418,7 +456,7 @@ function ProjectChooser({ projects, onChoose }) {
   )
 }
 
-function PickStep({ target, session, error, onCancel, onRestart }) {
+function PickStep({ target, session, stalled, onCancel, onRestart }) {
   return (
     <section className="panel">
       <h2>
@@ -426,13 +464,20 @@ function PickStep({ target, session, error, onCancel, onRestart }) {
         {target.isNew && <span className="badge">new</span>}
       </h2>
       {!session ? (
-        error ? (
+        stalled ? (
           <button className="primary" onClick={onRestart}>
             Try again
           </button>
         ) : (
           <p className="muted">Connecting to Google Photos…</p>
         )
+      ) : stalled ? (
+        <>
+          <p>This page lost track of your Google Photos picks. Start again and pick the photos once more.</p>
+          <button className="primary" onClick={onRestart}>
+            Start picking again
+          </button>
+        </>
       ) : (
         <>
           <ol className="steps">
@@ -442,13 +487,7 @@ function PickStep({ target, session, error, onCancel, onRestart }) {
           <a className="primary" href={pickerLink(session.pickerUri)} target="_blank" rel="noopener noreferrer">
             Open Google Photos
           </a>
-          {error ? (
-            <button className="secondary" onClick={onRestart}>
-              Start picking again
-            </button>
-          ) : (
-            <p className="muted waiting">Waiting for your picks…</p>
-          )}
+          <p className="muted waiting">Waiting for your picks…</p>
         </>
       )}
       <button className="link-button" onClick={onCancel}>

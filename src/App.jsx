@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Gallery from './components/Gallery'
 import Modal from './components/Modal'
+import { loadManifest } from './lib/manifest'
 import './App.css'
 
 export default function App() {
@@ -10,11 +11,7 @@ export default function App() {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    fetch('images-manifest.json')
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to load manifest')
-        return r.json()
-      })
+    loadManifest()
       .then(setEntries)
       .catch(e => setError(e.message))
   }, [])

@@ -1,11 +1,20 @@
-// The admin page's (admin.html) back end. It copies photos picked in Google
-// Photos into Cloudinary, hides and deletes photos and projects there, and asks
-// GitHub to rebuild the image manifest.
+// The site's back end.
 //
-// Google's download links expire after an hour and need the owner's Google
-// token in a header, which browsers can't send there, so the copy happens here.
-// Every request must carry the owner's Google access token; it is checked with
-// Google and never stored.
+// GET /manifest (public) is the gallery's list of projects and photos, built
+// from Cloudinary and kept in KV, so visitors never cost Cloudinary API calls
+// and changes show up as soon as they're made.
+//
+// Everything else is for the admin page (admin.html): it copies photos picked
+// in Google Photos into Cloudinary, hides and deletes photos and projects
+// there, and refreshes the manifest. Google's download links expire after an
+// hour and need the owner's Google token in a header, which browsers can't
+// send there, so the copy happens here. Those requests must carry the owner's
+// Google access token; it is checked with Google and never stored.
+
+import folders from '../../folders.json' with { type: 'json' }
+import { HIDDEN_PROJECT_TAG, HIDDEN_TAG, buildManifest, exifToIso, isProjectFolder, knownDates, undated } from './manifest.js'
+
+export { HIDDEN_PROJECT_TAG, HIDDEN_TAG }
 
 const GOOGLE_PHOTO_URL = /^https:\/\/[a-z0-9-]+\.googleusercontent\.com\//
 // New projects get slug folders; older ones can have spaces ("baptism crosses").
@@ -14,14 +23,13 @@ const PROJECT_FOLDER = /^[\w -]+\/[\w -]+$/
 const MAX_UPLOAD_BYTES = 10_000_000 // Cloudinary free-plan image limit
 const FALLBACK_SIZE = '=w4000-h4000'
 const BATCH_SIZE = 100 // most public IDs Cloudinary's delete call takes
+const MANIFEST_KEY = 'manifest'
+// Without KV, a manifest built here is reused for this long by this instance.
+const MEMORY_TTL_MS = 60_000
+// Each camera-date lookup is an Admin API call; more wait for the next refresh.
+const MAX_EXIF_LOOKUPS = 20
 
-// Hidden photos stay in Cloudinary but scripts/generate-manifest.js leaves
-// them off the site. Tags, not context, because adding or removing one tag
-// leaves the photo's other metadata alone.
-export const HIDDEN_TAG = 'hidden'
-// Put on every photo of a hidden project. A project is hidden while any of its
-// photos has it, so photos added later stay hidden too.
-export const HIDDEN_PROJECT_TAG = 'hidden-project'
+const NAMES = Object.fromEntries(folders.filter(e => e?.folder && e?.name).map(e => [e.folder, e.name]))
 
 class HttpError extends Error {
   constructor(status, message) {
@@ -32,6 +40,9 @@ class HttpError extends Error {
 
 export default {
   async fetch(request, env) {
+    const { pathname } = new URL(request.url)
+    if (pathname === '/manifest' && request.method === 'GET') return serveManifest(env)
+
     const cors = corsHeaders(request, env)
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors })
 
@@ -39,7 +50,6 @@ export default {
       if (!env.OWNER_EMAIL || !env.GOOGLE_CLIENT_ID) throw new HttpError(503, 'Uploader is not configured yet')
       if (request.method !== 'POST') throw new HttpError(405, 'Method not allowed')
 
-      const { pathname } = new URL(request.url)
       const googleToken = await requireOwner(request, env)
 
       if (pathname === '/copy') return json(await copyPhoto(await readJson(request), googleToken, env), 200, cors)
@@ -177,10 +187,10 @@ async function uploadToCloudinary(env, photo, filename, params) {
   return data
 }
 
-// Every photo in every project, hidden ones included, for the admin page.
-// One Admin API call per 500 photos (the free plan allows 500 calls an hour).
-async function listProjects(env) {
-  const projects = new Map()
+// Every image in Cloudinary with its tags and context. One Admin API call per
+// 500 photos (the free plan allows 500 calls an hour).
+async function listResources(env) {
+  const resources = []
   let cursor
   do {
     const page = await adminApi(env, 'GET', 'resources/image', {
@@ -189,25 +199,101 @@ async function listProjects(env) {
       tags: true,
       ...(cursor ? { next_cursor: cursor } : {}),
     })
-    for (const r of page.resources ?? []) {
-      const assetFolder = r.asset_folder ?? ''
-      if (!PROJECT_FOLDER.test(assetFolder)) continue
-      const context = r.context?.custom ?? r.context ?? {}
-      const tags = r.tags ?? []
-      if (!projects.has(assetFolder)) projects.set(assetFolder, { assetFolder, product: null, hidden: false, photos: [] })
-      const project = projects.get(assetFolder)
-      project.product ??= context.product ?? null
-      project.hidden ||= tags.includes(HIDDEN_PROJECT_TAG)
-      project.photos.push({
-        publicId: r.public_id,
-        url: r.secure_url,
-        taken: context.taken ?? r.created_at ?? null,
-        hidden: tags.includes(HIDDEN_TAG),
-      })
-    }
+    resources.push(...(page.resources ?? []))
     cursor = page.next_cursor
   } while (cursor)
+  return resources
+}
+
+// Every photo in every project, hidden ones included, for the admin page.
+async function listProjects(env) {
+  const projects = new Map()
+  for (const r of await listResources(env)) {
+    const assetFolder = r.asset_folder ?? ''
+    if (!isProjectFolder(assetFolder)) continue
+    const context = r.context?.custom ?? r.context ?? {}
+    const tags = r.tags ?? []
+    if (!projects.has(assetFolder)) projects.set(assetFolder, { assetFolder, product: null, hidden: false, photos: [] })
+    const project = projects.get(assetFolder)
+    project.product ??= context.product ?? null
+    project.hidden ||= tags.includes(HIDDEN_PROJECT_TAG)
+    project.photos.push({
+      publicId: r.public_id,
+      url: r.secure_url,
+      taken: context.taken ?? r.created_at ?? null,
+      hidden: tags.includes(HIDDEN_TAG),
+    })
+  }
   return { projects: [...projects.values()] }
+}
+
+// ── The site's manifest ──────────────────────────────────────────────────────
+
+let memory = null // { at, text }, used when there's no KV namespace
+
+async function serveManifest(env) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Cache-Control': 'no-cache',
+    'Content-Type': 'application/json',
+  }
+  try {
+    const body = (await readStoredManifest(env)) ?? JSON.stringify(await refreshManifest(env))
+    return new Response(body, { status: 200, headers })
+  } catch (e) {
+    // The site falls back to its static copy.
+    return new Response(JSON.stringify({ error: e.message }), { status: 502, headers })
+  }
+}
+
+async function readStoredManifest(env) {
+  if (env.MANIFEST) return env.MANIFEST.get(MANIFEST_KEY)
+  return memory && Date.now() - memory.at < MEMORY_TTL_MS ? memory.text : null
+}
+
+// Rebuilds the manifest from Cloudinary and stores it. Dates already worked out
+// (in the stored manifest or the site's static copy) are reused, since a
+// camera date costs an API call.
+export async function refreshManifest(env) {
+  const [resources, stored, fallback] = await Promise.all([
+    listResources(env),
+    readStoredManifest(env).catch(() => null),
+    fetchStaticManifest(env),
+  ])
+  const known = { ...knownDates(fallback), ...knownDates(parseJson(stored)) }
+
+  const exif = {}
+  for (const id of undated(resources, known).slice(0, MAX_EXIF_LOOKUPS)) {
+    const details = await adminApi(env, 'GET', `resources/image/upload/${encodeURIComponent(id)}`, { image_metadata: true })
+      .catch(() => ({}))
+    const meta = details.image_metadata ?? {}
+    const date = exifToIso(meta.DateTimeOriginal) ?? exifToIso(meta.CreateDate)
+    if (date) exif[id] = date
+  }
+
+  const manifest = buildManifest(resources, { cloud: env.CLOUDINARY_CLOUD_NAME, names: NAMES, known, exif })
+  const text = JSON.stringify(manifest)
+  if (env.MANIFEST) await env.MANIFEST.put(MANIFEST_KEY, text)
+  else memory = { at: Date.now(), text }
+  return manifest
+}
+
+async function fetchStaticManifest(env) {
+  if (!env.SITE_URL) return null
+  try {
+    const res = await fetch(`${env.SITE_URL.replace(/\/$/, '')}/images-manifest.json`)
+    return res.ok ? await res.json() : null
+  } catch {
+    return null
+  }
+}
+
+function parseJson(text) {
+  try {
+    return text ? JSON.parse(text) : null
+  } catch {
+    return null
+  }
 }
 
 async function setHidden(body, env) {
@@ -315,7 +401,20 @@ async function tagPhotos(env, command, tag, publicIds) {
   return data
 }
 
+// Puts changes on the site: the live manifest now, and the static copy in the
+// repo (the site's fallback) through the "Update Image Manifest" workflow.
+// The site doesn't wait for the workflow, so a failure there is only reported.
 async function publish(env) {
+  await refreshManifest(env)
+  try {
+    await startManifestWorkflow(env)
+    return { ok: true, backup: true }
+  } catch (e) {
+    return { ok: true, backup: false, warning: e.message }
+  }
+}
+
+async function startManifestWorkflow(env) {
   const res = await fetch(
     `https://api.github.com/repos/${env.GITHUB_REPO}/actions/workflows/update-manifest.yml/dispatches`,
     {
@@ -329,6 +428,5 @@ async function publish(env) {
       body: JSON.stringify({ ref: 'main' }),
     }
   )
-  if (res.status !== 204) throw new HttpError(502, `Could not start the site update (GitHub ${res.status})`)
-  return { ok: true }
+  if (res.status !== 204) throw new HttpError(502, `Could not start the backup manifest update (GitHub ${res.status})`)
 }

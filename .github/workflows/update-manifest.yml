@@ -4,14 +4,16 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [scripts/generate-manifest.js]
+    paths: [scripts/generate-manifest.js, worker/src/manifest.js]
 
 permissions:
   contents: write
 
-# The admin page starts a run after every change. Runs wait for each other so
-# their commits don't race; a queued run reads Cloudinary when it starts, so
-# the newest one covers any it replaces.
+# The admin page starts a run after every change, to keep this static copy
+# (the site's fallback; the site reads the Worker's live manifest) up to date.
+# Runs wait for each other, and each checks out main as it is when it starts,
+# so a run builds on the previous run's commit instead of failing to push.
+# A queued run reads Cloudinary when it starts, so it covers any it replaces.
 concurrency:
   group: update-manifest
   cancel-in-progress: false
@@ -21,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-node@v4
         with:

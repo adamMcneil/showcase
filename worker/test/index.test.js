@@ -236,15 +236,132 @@ test('reports Cloudinary errors', async () => {
   assert.match((await res.json()).error, /Invalid Signature/)
 })
 
-test('publish starts the Update Image Manifest workflow on main', async () => {
+// ── The site's manifest ───────────────────────────────────────────────────────
+
+function fakeKv(initial) {
+  const store = new Map(initial ? [['manifest', initial]] : [])
+  return {
+    store,
+    async get(key) {
+      return store.get(key) ?? null
+    },
+    async put(key, value) {
+      store.set(key, value)
+    },
+  }
+}
+
+const boxPhoto = {
+  public_id: 'box_one',
+  asset_folder: 'images/box',
+  display_name: 'box_one',
+  created_at: '2024-03-01T00:00:00Z',
+  tags: [],
+  context: { custom: { taken: '2024-02-01T09:00:00' } },
+}
+
+test('publish refreshes the live manifest, then starts the Update Image Manifest workflow', async () => {
   route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  route('https://api.cloudinary.com/v1_1/demo/resources/image', () => jsonResponse({ resources: [boxPhoto] }))
   route('https://api.github.com/', () => new Response(null, { status: 204 }))
-  const res = await worker.fetch(post('/publish', {}), env)
+  const kv = fakeKv()
+  const res = await worker.fetch(post('/publish', {}), { ...env, MANIFEST: kv })
   assert.equal(res.status, 200)
+  assert.deepEqual(await res.json(), { ok: true, backup: true })
+
+  const stored = JSON.parse(kv.store.get('manifest'))
+  assert.deepEqual(stored.map(e => e.dir), ['Box'])
+  assert.deepEqual(stored[0].dates, ['2024-02-01T09:00:00'])
+
   const dispatch = calls.find(c => c.url.startsWith('https://api.github.com'))
   assert.equal(dispatch.url, 'https://api.github.com/repos/someone/showcase/actions/workflows/update-manifest.yml/dispatches')
   assert.equal(dispatch.init.headers.Authorization, 'Bearer gh-token')
   assert.deepEqual(JSON.parse(dispatch.init.body), { ref: 'main' })
+})
+
+test('publish still succeeds when GitHub refuses, since the site reads the live manifest', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  route('https://api.cloudinary.com/v1_1/demo/resources/image', () => jsonResponse({ resources: [boxPhoto] }))
+  route('https://api.github.com/', () => jsonResponse({ message: 'Bad credentials' }, 401))
+  const kv = fakeKv()
+  const res = await worker.fetch(post('/publish', {}), { ...env, MANIFEST: kv })
+  assert.equal(res.status, 200)
+  const body = await res.json()
+  assert.equal(body.backup, false)
+  assert.match(body.warning, /GitHub 401/)
+  assert.ok(kv.store.has('manifest'))
+})
+
+test('publish fails when Cloudinary does, and leaves the stored manifest alone', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  route('https://api.cloudinary.com/', () => jsonResponse({ error: { message: 'Rate Limit Exceeded' } }, 420))
+  const kv = fakeKv('[{"dir":"Old"}]')
+  const res = await worker.fetch(post('/publish', {}), { ...env, MANIFEST: kv })
+  assert.equal(res.status, 502)
+  assert.match((await res.json()).error, /Rate Limit Exceeded/)
+  assert.equal(kv.store.get('manifest'), '[{"dir":"Old"}]')
+  assert.equal(calls.filter(c => c.url.startsWith('https://api.github.com')).length, 0)
+})
+
+test('GET /manifest serves the stored manifest to anyone, without calling Cloudinary', async () => {
+  const kv = fakeKv('[{"dir":"Box"}]')
+  const res = await worker.fetch(new Request('https://uploader.example.workers.dev/manifest'), { ...env, MANIFEST: kv })
+  assert.equal(res.status, 200)
+  assert.equal(res.headers.get('Access-Control-Allow-Origin'), '*')
+  assert.equal(res.headers.get('Content-Type'), 'application/json')
+  assert.deepEqual(await res.json(), [{ dir: 'Box' }])
+  assert.equal(calls.length, 0)
+})
+
+test('GET /manifest builds and stores the manifest when there is none, reusing the site copy\'s dates', async () => {
+  const old = { ...boxPhoto, public_id: 'old_photo', display_name: 'old_photo', context: {} }
+  route('https://api.cloudinary.com/v1_1/demo/resources/image', () => jsonResponse({ resources: [boxPhoto, old] }))
+  route('https://site.example/images-manifest.json', () =>
+    jsonResponse([{ files: ['https://res.cloudinary.com/demo/image/upload/f_auto,q_auto/old_photo?_a=x'], dates: ['2019-05-05T05:05:05'] }])
+  )
+  const kv = fakeKv()
+  const res = await worker.fetch(new Request('https://uploader.example.workers.dev/manifest'), {
+    ...env,
+    MANIFEST: kv,
+    SITE_URL: 'https://site.example/',
+  })
+  assert.equal(res.status, 200)
+  const manifest = await res.json()
+  assert.deepEqual(manifest[0].dates, ['2019-05-05T05:05:05', '2024-02-01T09:00:00'])
+  assert.deepEqual(JSON.parse(kv.store.get('manifest')), manifest)
+  // Both photos had a date, so no camera-date lookups.
+  assert.equal(calls.filter(c => c.url.includes('/resources/image/upload/')).length, 0)
+})
+
+test('GET /manifest looks up camera dates only for photos with none', async () => {
+  const old = { ...boxPhoto, public_id: 'old_photo', display_name: 'old_photo', context: {} }
+  route('https://api.cloudinary.com/v1_1/demo/resources/image/upload/old_photo', () =>
+    jsonResponse({ image_metadata: { DateTimeOriginal: '2018:01:02 03:04:05' } })
+  )
+  route('https://api.cloudinary.com/v1_1/demo/resources/image', () => jsonResponse({ resources: [boxPhoto, old] }))
+  const res = await worker.fetch(new Request('https://uploader.example.workers.dev/manifest'), { ...env, MANIFEST: fakeKv() })
+  assert.deepEqual((await res.json())[0].dates, ['2018-01-02T03:04:05', '2024-02-01T09:00:00'])
+  const lookups = calls.filter(c => c.url.includes('/resources/image/upload/'))
+  assert.equal(lookups.length, 1)
+  assert.equal(new URL(lookups[0].url).searchParams.get('image_metadata'), 'true')
+})
+
+test('GET /manifest reports a Cloudinary failure so the site can fall back', async () => {
+  route('https://api.cloudinary.com/', () => jsonResponse({ error: { message: 'down' } }, 500))
+  const res = await worker.fetch(new Request('https://uploader.example.workers.dev/manifest'), { ...env, MANIFEST: fakeKv() })
+  assert.equal(res.status, 502)
+  assert.equal(res.headers.get('Access-Control-Allow-Origin'), '*')
+})
+
+test('without KV, a manifest built by publish is reused for a while', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  route('https://api.cloudinary.com/v1_1/demo/resources/image', () => jsonResponse({ resources: [boxPhoto] }))
+  route('https://api.github.com/', () => new Response(null, { status: 204 }))
+  await worker.fetch(post('/publish', {}), env)
+  const before = calls.length
+  const res = await worker.fetch(new Request('https://uploader.example.workers.dev/manifest'), env)
+  assert.deepEqual((await res.json()).map(e => e.dir), ['Box'])
+  assert.equal(calls.length, before)
 })
 
 // ── Hiding and deleting ───────────────────────────────────────────────────────

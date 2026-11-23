@@ -5,7 +5,7 @@ Open **https://adammcneil.github.io/showcase/admin.html** (on your phone is fine
 1. Sign in with Google.
 2. Pick a project, or type a new project's name.
 3. Tap **Open Google Photos**, tick the photos, tap **Done**, and come back to the browser tab.
-4. The page copies the photos into Cloudinary and starts the site update. The site shows them in 2–3 minutes.
+4. The page copies the photos into Cloudinary and updates the site. They show up straight away.
 
 Picking the same photo twice for the same project doesn't make a duplicate. Videos are skipped.
 
@@ -17,9 +17,9 @@ On the same page, open the **Hide or remove** tab (or go straight to `admin.html
 - Tap photos to select them, then **Hide**, **Show** or **Delete**.
 - **Delete project** deletes the project and all its photos.
 
-Each change starts the site update, which takes 2–3 minutes.
+Each change shows up on the site straight away.
 
-Hiding keeps the photos in Cloudinary. The Worker tags them (`hidden` on a photo, `hidden-project` on every photo of a hidden project), and the manifest script leaves tagged photos out. A project stays hidden while any of its photos has `hidden-project`, so photos you add to a hidden project stay hidden too. You can hide or show photos in the Cloudinary Media Library by adding or removing those tags.
+Hiding keeps the photos in Cloudinary. The Worker tags them (`hidden` on a photo, `hidden-project` on every photo of a hidden project), and the site's manifest leaves tagged photos out. A project stays hidden while any of its photos has `hidden-project`, so photos you add to a hidden project stay hidden too. You can hide or show photos in the Cloudinary Media Library by adding or removing those tags.
 
 Deleting removes the photos from Cloudinary, and can't be undone. Photos added from Google Photos are still in Google Photos.
 
@@ -31,17 +31,25 @@ admin.html (GitHub Pages)  ──sign in──▶ Google
         ▼
 Uploader Worker (Cloudflare, worker/)
         │  checks the Google token is yours, downloads each photo from Google,
-        │  uploads it to Cloudinary <root>/<project>, then starts
+        │  uploads it to Cloudinary <root>/<project>, then rebuilds the manifest
         ▼
-"Update Image Manifest" workflow ──▶ "Deploy to GitHub Pages"
+KV "showcase-manifest" ◀── GET /manifest ── the site (index.html)
+
+        └─ also starts "Update Image Manifest" ──▶ "Deploy to GitHub Pages"
+           (the static copy in public/, which the site falls back to)
 ```
+
+The site reads its list of projects and photos (the manifest) live from the Worker's `GET /manifest`, which serves it from Cloudflare KV. Each change on the admin page rebuilds it from Cloudinary, so the site never waits for GitHub. If the Worker can't be reached within 3 seconds, the site uses the static `public/images-manifest.json` instead, which the "Update Image Manifest" workflow keeps up to date. Both are built by `worker/src/manifest.js`.
+
+A photo uploaded straight to Cloudinary (not through the admin page) shows up after the next change made on the admin page.
 
 - Google only lets apps read photos you pick, and its download links last an hour and need your Google token, so each photo is copied to Cloudinary when you pick it. Google Photos stays the original.
 - The Worker exists because browsers can't download from Google's photo links. It never stores your Google token. It accepts requests only from your Google account (`OWNER_EMAIL`).
-- The manifest still comes from Cloudinary folders. New projects store their display name on the photos (Cloudinary context `product`), so `folders.json` is only needed to rename a project.
+- Projects are the Cloudinary folders one level under the root. New projects store their display name on the photos (Cloudinary context `product`), so `folders.json` is only needed to rename a project.
 - Photos added here are dated by Google Photos; photos uploaded straight to Cloudinary use their camera (EXIF) date.
-- Cloudinary's free plan allows 500 Admin API calls an hour. The manifest script reuses the dates already in `public/images-manifest.json` and only looks up photos it hasn't seen, so a run costs one or two calls. The **Hide or remove** tab costs one or two calls to open and one or two per change.
-- The "Update Image Manifest" workflow runs one at a time, so several quick changes queue up instead of racing. A queued run reads Cloudinary when it starts, so the last one includes every change.
+- Cloudinary's free plan allows 500 Admin API calls an hour. Visitors cost none, since the Worker serves the manifest from KV. Rebuilding it reuses the dates already worked out and only looks up the camera date of photos it hasn't seen, so a rebuild costs one or two calls. The **Hide or remove** tab costs one or two calls to open and two or three per change.
+- The deploy workflow finds or creates the KV namespace `showcase-manifest` with the Cloudflare token. If that fails, the Worker still works without it, rebuilding the manifest about once a minute while the site is being viewed.
+- The "Update Image Manifest" workflow runs one at a time and checks out the latest `main`, so several quick changes queue up instead of failing to push. A queued run reads Cloudinary when it starts, so the last one includes every change.
 
 Still done in Cloudinary or `folders.json`: choosing the cover (name it `first`), renaming a project.
 
@@ -69,7 +77,7 @@ Google shows an "app isn't verified" warning when you sign in. That's expected f
 ### 3. GitHub token for the Worker
 
 GitHub **Settings → Developer settings → Fine-grained tokens → Generate new token**:
-repository access **Only select repositories → showcase**, permission **Actions: Read and write**. Copy it. Note its expiry date; when it expires, adding photos fails at "Starting the site update" until you replace the secret.
+repository access **Only select repositories → showcase**, permission **Actions: Read and write**. Copy it. Note its expiry date; when it expires, the static fallback copy stops updating (the live site doesn't need it) until you replace the secret.
 
 ### 4. Repo secrets and variables
 

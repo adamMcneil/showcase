@@ -8,3 +8,9 @@ compatibility_date = "2025-06-01"
 [vars]
 ALLOWED_ORIGINS = "https://adammcneil.github.io,http://localhost:5173,http://localhost:4173"
 GITHUB_REPO = "adamMcneil/showcase"
+# The deployed site; its static manifest has dates for photos uploaded before
+# the admin page saved them.
+SITE_URL = "https://adammcneil.github.io/showcase/"
+
+# KV namespace MANIFEST (the site's manifest) is bound at deploy time by
+# .github/workflows/deploy-worker.yml, which finds or creates "showcase-manifest".
