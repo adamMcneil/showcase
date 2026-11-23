@@ -18,6 +18,20 @@ export function copyPhoto(token, { assetFolder, productName, item }) {
   return call(token, '/copy', { assetFolder, productName, item })
 }
 
+// Every project and photo in Cloudinary, hidden ones included.
+export function listProjects(token) {
+  return call(token, '/list')
+}
+
+// Target: { assetFolder, project: true } or { assetFolder, publicIds: [...] }.
+export function setHidden(token, target, hidden) {
+  return call(token, '/hide', { ...target, hidden })
+}
+
+export function deletePhotos(token, target) {
+  return call(token, '/delete', target)
+}
+
 export function publish(token) {
   return call(token, '/publish')
 }

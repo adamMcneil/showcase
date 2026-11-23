@@ -9,6 +9,20 @@ Open **https://adammcneil.github.io/showcase/admin.html** (on your phone is fine
 
 Picking the same photo twice for the same project doesn't make a duplicate. Videos are skipped.
 
+## Hiding and removing
+
+On the same page, open the **Hide or remove** tab (or go straight to `admin.html#manage`) and pick a project:
+
+- **Hide project** / **Show project** takes the whole project off the site or puts it back.
+- Tap photos to select them, then **Hide**, **Show** or **Delete**.
+- **Delete project** deletes the project and all its photos.
+
+Each change starts the site update, which takes 2–3 minutes.
+
+Hiding keeps the photos in Cloudinary. The Worker tags them (`hidden` on a photo, `hidden-project` on every photo of a hidden project), and the manifest script leaves tagged photos out. A project stays hidden while any of its photos has `hidden-project`, so photos you add to a hidden project stay hidden too. You can hide or show photos in the Cloudinary Media Library by adding or removing those tags.
+
+Deleting removes the photos from Cloudinary, and can't be undone. Photos added from Google Photos are still in Google Photos.
+
 ## How it works
 
 ```
@@ -26,9 +40,10 @@ Uploader Worker (Cloudflare, worker/)
 - The Worker exists because browsers can't download from Google's photo links. It never stores your Google token. It accepts requests only from your Google account (`OWNER_EMAIL`).
 - The manifest still comes from Cloudinary folders. New projects store their display name on the photos (Cloudinary context `product`), so `folders.json` is only needed to rename a project.
 - Photos added here are dated by Google Photos; photos uploaded straight to Cloudinary use their camera (EXIF) date.
-- Cloudinary's free plan allows 500 Admin API calls an hour. The manifest script reuses the dates already in `public/images-manifest.json` and only looks up photos it hasn't seen, so a run costs one or two calls.
+- Cloudinary's free plan allows 500 Admin API calls an hour. The manifest script reuses the dates already in `public/images-manifest.json` and only looks up photos it hasn't seen, so a run costs one or two calls. The **Hide or remove** tab costs one or two calls to open and one or two per change.
+- The "Update Image Manifest" workflow runs one at a time, so several quick changes queue up instead of racing. A queued run reads Cloudinary when it starts, so the last one includes every change.
 
-Still done in Cloudinary or `folders.json`: removing a photo, choosing the cover (name it `first`), renaming a project.
+Still done in Cloudinary or `folders.json`: choosing the cover (name it `first`), renaming a project.
 
 ## One-time setup
 

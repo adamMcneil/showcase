@@ -1,6 +1,6 @@
 import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import worker, { cloudinarySignature, contextString, fileStem } from '../src/index.js'
+import worker, { HIDDEN_PROJECT_TAG, HIDDEN_TAG, chunks, cloudinarySignature, contextString, fileStem } from '../src/index.js'
 
 const env = {
   GOOGLE_CLIENT_ID: 'client-123.apps.googleusercontent.com',
@@ -245,4 +245,191 @@ test('publish starts the Update Image Manifest workflow on main', async () => {
   assert.equal(dispatch.url, 'https://api.github.com/repos/someone/showcase/actions/workflows/update-manifest.yml/dispatches')
   assert.equal(dispatch.init.headers.Authorization, 'Bearer gh-token')
   assert.deepEqual(JSON.parse(dispatch.init.body), { ref: 'main' })
+})
+
+// ── Hiding and deleting ───────────────────────────────────────────────────────
+
+const basicAuth = `Basic ${btoa('key:secret')}`
+
+// A Cloudinary folder listing as resources/by_asset_folder returns it.
+function folderRoute(byFolder) {
+  route('https://api.cloudinary.com/v1_1/demo/resources/by_asset_folder', url => {
+    const folder = new URL(url).searchParams.get('asset_folder')
+    return jsonResponse({ resources: (byFolder[folder] ?? []).map(public_id => ({ public_id, resource_type: 'image', type: 'upload' })) })
+  })
+}
+
+function cloudinaryCalls(path) {
+  return calls.filter(c => c.url.startsWith(`https://api.cloudinary.com/v1_1/demo/${path}`))
+}
+
+test('chunks splits into batches', () => {
+  assert.deepEqual(chunks([1, 2, 3, 4, 5], 2), [[1, 2], [3, 4], [5]])
+  assert.deepEqual(chunks([], 2), [])
+})
+
+test('list groups every photo by project, hidden ones included', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  route('https://api.cloudinary.com/v1_1/demo/resources/image', url => {
+    const cursor = new URL(url).searchParams.get('next_cursor')
+    if (!cursor) {
+      return jsonResponse({
+        next_cursor: 'page2',
+        resources: [
+          { public_id: 'a1', asset_folder: 'images/box', secure_url: 'https://x/a1', created_at: '2024-01-01T00:00:00Z', tags: [], context: { custom: { taken: '2023-05-01T10:00:00' } } },
+          { public_id: 'a2', asset_folder: 'images/box', secure_url: 'https://x/a2', created_at: '2024-01-02T00:00:00Z', tags: [HIDDEN_TAG] },
+          { public_id: 'loose', asset_folder: 'images', secure_url: 'https://x/loose', tags: [] },
+          { public_id: 'deep', asset_folder: 'images/box/old', secure_url: 'https://x/deep', tags: [] },
+        ],
+      })
+    }
+    return jsonResponse({
+      resources: [
+        { public_id: 'b1', asset_folder: 'images/baptism crosses', secure_url: 'https://x/b1', created_at: '2024-02-01T00:00:00Z', tags: [HIDDEN_PROJECT_TAG], context: { custom: { product: 'Baptism Crosses' } } },
+        { public_id: 'b2', asset_folder: 'images/baptism crosses', secure_url: 'https://x/b2', created_at: '2024-02-02T00:00:00Z' },
+      ],
+    })
+  })
+
+  const res = await worker.fetch(post('/list', {}), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual(await res.json(), {
+    projects: [
+      {
+        assetFolder: 'images/box',
+        product: null,
+        hidden: false,
+        photos: [
+          { publicId: 'a1', url: 'https://x/a1', taken: '2023-05-01T10:00:00', hidden: false },
+          { publicId: 'a2', url: 'https://x/a2', taken: '2024-01-02T00:00:00Z', hidden: true },
+        ],
+      },
+      {
+        assetFolder: 'images/baptism crosses',
+        product: 'Baptism Crosses',
+        hidden: true,
+        photos: [
+          { publicId: 'b1', url: 'https://x/b1', taken: '2024-02-01T00:00:00Z', hidden: false },
+          { publicId: 'b2', url: 'https://x/b2', taken: '2024-02-02T00:00:00Z', hidden: false },
+        ],
+      },
+    ],
+  })
+
+  const lists = cloudinaryCalls('resources/image')
+  assert.equal(lists.length, 2)
+  const first = new URL(lists[0].url).searchParams
+  assert.equal(first.get('tags'), 'true')
+  assert.equal(first.get('context'), 'true')
+  assert.equal(first.get('max_results'), '500')
+  assert.equal(new URL(lists[1].url).searchParams.get('next_cursor'), 'page2')
+  assert.equal(lists[0].init.headers.Authorization, basicAuth)
+})
+
+test('hiding photos tags them with a signed request', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  folderRoute({ 'images/box': ['a1', 'a2', 'a3'] })
+  route('https://api.cloudinary.com/v1_1/demo/image/tags', () => jsonResponse({ public_ids: ['a1', 'a3'] }))
+
+  const res = await worker.fetch(post('/hide', { assetFolder: 'images/box', publicIds: ['a1', 'a3'], hidden: true }), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual(await res.json(), { changed: 2 })
+
+  const listing = cloudinaryCalls('resources/by_asset_folder')[0]
+  assert.equal(new URL(listing.url).searchParams.get('asset_folder'), 'images/box')
+  assert.equal(listing.init.headers.Authorization, basicAuth)
+
+  const [tagCall] = cloudinaryCalls('image/tags')
+  const form = tagCall.init.body
+  assert.equal(form.get('command'), 'add')
+  assert.equal(form.get('tag'), HIDDEN_TAG)
+  assert.deepEqual(form.getAll('public_ids[]'), ['a1', 'a3'])
+  assert.equal(form.get('api_key'), 'key')
+  const signed = { command: 'add', public_ids: 'a1,a3', tag: HIDDEN_TAG, timestamp: form.get('timestamp') }
+  assert.equal(form.get('signature'), await cloudinarySignature(signed, 'secret'))
+})
+
+test('showing a project removes the project tag from all its photos', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  folderRoute({ 'images/baptism crosses': ['b1', 'b2'] })
+  route('https://api.cloudinary.com/v1_1/demo/image/tags', () => jsonResponse({}))
+
+  const res = await worker.fetch(post('/hide', { assetFolder: 'images/baptism crosses', project: true, hidden: false }), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual(await res.json(), { changed: 2 })
+  const form = cloudinaryCalls('image/tags')[0].init.body
+  assert.equal(form.get('command'), 'remove')
+  assert.equal(form.get('tag'), HIDDEN_PROJECT_TAG)
+  assert.deepEqual(form.getAll('public_ids[]'), ['b1', 'b2'])
+})
+
+test('refuses to touch photos from another project', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  folderRoute({ 'images/box': ['a1'] })
+  for (const [path, extra] of [['/hide', { hidden: true }], ['/delete', {}]]) {
+    const res = await worker.fetch(post(path, { assetFolder: 'images/box', publicIds: ['a1', 'elsewhere'], ...extra }), env)
+    assert.equal(res.status, 400, path)
+    assert.match((await res.json()).error, /elsewhere/)
+  }
+  assert.equal(cloudinaryCalls('image/tags').length, 0)
+  assert.equal(calls.filter(c => c.init.method === 'DELETE').length, 0)
+})
+
+test('refuses unclear hide and delete requests before calling Cloudinary', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  const bad = [
+    ['/hide', { assetFolder: 'images/box', publicIds: ['a1'] }],
+    ['/hide', { assetFolder: 'images/box', hidden: true }],
+    ['/delete', { assetFolder: 'images/box' }],
+    ['/delete', { assetFolder: 'images/box', project: 'yes' }],
+    ['/delete', { assetFolder: 'images/box', publicIds: [] }],
+    ['/delete', { assetFolder: 'images/box', publicIds: [42] }],
+    ['/delete', { assetFolder: 'box', project: true }],
+    ['/delete', { assetFolder: 'images/box/extra', project: true }],
+    ['/delete', { assetFolder: '../box', project: true }],
+  ]
+  for (const [path, body] of bad) {
+    const res = await worker.fetch(post(path, body), env)
+    assert.equal(res.status, 400, JSON.stringify(body))
+  }
+  assert.equal(calls.filter(c => c.url.startsWith('https://api.cloudinary.com')).length, 0)
+})
+
+test('deleting photos deletes only those, and keeps the folder', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  folderRoute({ 'images/box': ['a1', 'a2', 'a3'] })
+  route('https://api.cloudinary.com/v1_1/demo/resources/image/upload', () =>
+    jsonResponse({ deleted: { a2: 'deleted', a3: 'not_found' }, partial: false })
+  )
+
+  const res = await worker.fetch(post('/delete', { assetFolder: 'images/box', publicIds: ['a2', 'a3'] }), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual(await res.json(), { deleted: ['a2', 'a3'] })
+
+  const deletes = calls.filter(c => c.init.method === 'DELETE')
+  assert.equal(deletes.length, 1)
+  assert.equal(deletes[0].init.headers.Authorization, basicAuth)
+  assert.deepEqual(new URL(deletes[0].url).searchParams.getAll('public_ids[]'), ['a2', 'a3'])
+})
+
+test('deleting a project deletes its photos in batches of 100, then its folder', async () => {
+  route('https://oauth2.googleapis.com/tokeninfo', () => jsonResponse(ownerTokenInfo))
+  const ids = Array.from({ length: 150 }, (_, i) => `p${i}`)
+  folderRoute({ 'images/baptism crosses': ids })
+  route('https://api.cloudinary.com/v1_1/demo/resources/image/upload', url =>
+    jsonResponse({ deleted: Object.fromEntries(new URL(url).searchParams.getAll('public_ids[]').map(id => [id, 'deleted'])) })
+  )
+  // Cloudinary refuses while it still sees the folder's photos; that's ignored.
+  route('https://api.cloudinary.com/v1_1/demo/folders/', () => jsonResponse({ error: { message: 'Folder is not empty' } }, 400))
+
+  const res = await worker.fetch(post('/delete', { assetFolder: 'images/baptism crosses', project: true }), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual((await res.json()).deleted, ids)
+
+  const batches = cloudinaryCalls('resources/image/upload').map(c => new URL(c.url).searchParams.getAll('public_ids[]').length)
+  assert.deepEqual(batches, [100, 50])
+  const folder = cloudinaryCalls('folders/')
+  assert.equal(folder.length, 1)
+  assert.equal(folder[0].url, 'https://api.cloudinary.com/v1_1/demo/folders/images/baptism%20crosses')
+  assert.equal(folder[0].init.method, 'DELETE')
 })

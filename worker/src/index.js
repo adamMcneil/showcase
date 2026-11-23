@@ -1,5 +1,6 @@
-// Copies photos picked in Google Photos into Cloudinary, then asks GitHub to
-// rebuild the image manifest. Called by the admin page (admin.html).
+// The admin page's (admin.html) back end. It copies photos picked in Google
+// Photos into Cloudinary, hides and deletes photos and projects there, and asks
+// GitHub to rebuild the image manifest.
 //
 // Google's download links expire after an hour and need the owner's Google
 // token in a header, which browsers can't send there, so the copy happens here.
@@ -7,9 +8,20 @@
 // Google and never stored.
 
 const GOOGLE_PHOTO_URL = /^https:\/\/[a-z0-9-]+\.googleusercontent\.com\//
+// New projects get slug folders; older ones can have spaces ("baptism crosses").
 const ASSET_FOLDER = /^[\w -]+\/[a-z0-9]+(?:-[a-z0-9]+)*$/
+const PROJECT_FOLDER = /^[\w -]+\/[\w -]+$/
 const MAX_UPLOAD_BYTES = 10_000_000 // Cloudinary free-plan image limit
 const FALLBACK_SIZE = '=w4000-h4000'
+const BATCH_SIZE = 100 // most public IDs Cloudinary's delete call takes
+
+// Hidden photos stay in Cloudinary but scripts/generate-manifest.js leaves
+// them off the site. Tags, not context, because adding or removing one tag
+// leaves the photo's other metadata alone.
+export const HIDDEN_TAG = 'hidden'
+// Put on every photo of a hidden project. A project is hidden while any of its
+// photos has it, so photos added later stay hidden too.
+export const HIDDEN_PROJECT_TAG = 'hidden-project'
 
 class HttpError extends Error {
   constructor(status, message) {
@@ -31,6 +43,9 @@ export default {
       const googleToken = await requireOwner(request, env)
 
       if (pathname === '/copy') return json(await copyPhoto(await readJson(request), googleToken, env), 200, cors)
+      if (pathname === '/list') return json(await listProjects(env), 200, cors)
+      if (pathname === '/hide') return json(await setHidden(await readJson(request), env), 200, cors)
+      if (pathname === '/delete') return json(await deletePhotos(await readJson(request), env), 200, cors)
       if (pathname === '/publish') return json(await publish(env), 200, cors)
       throw new HttpError(404, 'Not found')
     } catch (e) {
@@ -79,7 +94,7 @@ async function requireOwner(request, env) {
   const sameApp = info.aud === env.GOOGLE_CLIENT_ID || info.azp === env.GOOGLE_CLIENT_ID
   const isOwner = String(info.email_verified) === 'true'
     && (info.email ?? '').toLowerCase() === env.OWNER_EMAIL.toLowerCase()
-  if (!sameApp || !isOwner) throw new HttpError(403, 'This Google account is not allowed to add photos')
+  if (!sameApp || !isOwner) throw new HttpError(403, 'This Google account is not allowed to change the site')
   return token
 }
 
@@ -159,6 +174,144 @@ async function uploadToCloudinary(env, photo, filename, params) {
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new HttpError(502, `Cloudinary upload failed: ${data.error?.message ?? res.status}`)
+  return data
+}
+
+// Every photo in every project, hidden ones included, for the admin page.
+// One Admin API call per 500 photos (the free plan allows 500 calls an hour).
+async function listProjects(env) {
+  const projects = new Map()
+  let cursor
+  do {
+    const page = await adminApi(env, 'GET', 'resources/image', {
+      max_results: 500,
+      context: true,
+      tags: true,
+      ...(cursor ? { next_cursor: cursor } : {}),
+    })
+    for (const r of page.resources ?? []) {
+      const assetFolder = r.asset_folder ?? ''
+      if (!PROJECT_FOLDER.test(assetFolder)) continue
+      const context = r.context?.custom ?? r.context ?? {}
+      const tags = r.tags ?? []
+      if (!projects.has(assetFolder)) projects.set(assetFolder, { assetFolder, product: null, hidden: false, photos: [] })
+      const project = projects.get(assetFolder)
+      project.product ??= context.product ?? null
+      project.hidden ||= tags.includes(HIDDEN_PROJECT_TAG)
+      project.photos.push({
+        publicId: r.public_id,
+        url: r.secure_url,
+        taken: context.taken ?? r.created_at ?? null,
+        hidden: tags.includes(HIDDEN_TAG),
+      })
+    }
+    cursor = page.next_cursor
+  } while (cursor)
+  return { projects: [...projects.values()] }
+}
+
+async function setHidden(body, env) {
+  if (typeof body?.hidden !== 'boolean') throw new HttpError(400, 'Say whether to hide or show')
+  const { ids, project } = await resolveTargets(body, env)
+  const tag = project ? HIDDEN_PROJECT_TAG : HIDDEN_TAG
+  for (const batch of chunks(ids, BATCH_SIZE)) await tagPhotos(env, body.hidden ? 'add' : 'remove', tag, batch)
+  return { changed: ids.length }
+}
+
+async function deletePhotos(body, env) {
+  const { ids, project } = await resolveTargets(body, env)
+  const deleted = []
+  for (const batch of chunks(ids, BATCH_SIZE)) {
+    const res = await adminApi(env, 'DELETE', 'resources/image/upload', { public_ids: batch })
+    // "not_found" means it's already gone, which is what was asked for.
+    for (const [id, status] of Object.entries(res.deleted ?? {})) {
+      if (status === 'deleted' || status === 'not_found') deleted.push(id)
+    }
+  }
+  if (project) {
+    // Tidies up the Media Library; the site only lists folders with photos.
+    const path = body.assetFolder.split('/').map(encodeURIComponent).join('/')
+    await adminApi(env, 'DELETE', `folders/${path}`).catch(() => {})
+  }
+  return { deleted }
+}
+
+// Body: { assetFolder, project: true } for a whole project, or
+// { assetFolder, publicIds: [...] } for photos, which must be in that project.
+async function resolveTargets(body, env) {
+  const { assetFolder, publicIds, project } = body ?? {}
+  if (typeof assetFolder !== 'string' || !PROJECT_FOLDER.test(assetFolder)) throw new HttpError(400, 'Bad project folder')
+  const wholeProject = project === true
+  if (!wholeProject) {
+    const valid = Array.isArray(publicIds) && publicIds.length > 0 && publicIds.every(id => typeof id === 'string' && id)
+    if (!valid) throw new HttpError(400, 'Say which photos, or the whole project')
+  }
+
+  const inFolder = await folderPhotoIds(env, assetFolder)
+  if (wholeProject) {
+    if (inFolder.length === 0) throw new HttpError(404, 'That project has no photos')
+    return { ids: inFolder, project: true }
+  }
+  const known = new Set(inFolder)
+  const strays = publicIds.filter(id => !known.has(id))
+  if (strays.length) throw new HttpError(400, `Not in this project: ${strays.join(', ')}`)
+  return { ids: [...new Set(publicIds)], project: false }
+}
+
+async function folderPhotoIds(env, assetFolder) {
+  const ids = []
+  let cursor
+  do {
+    const page = await adminApi(env, 'GET', 'resources/by_asset_folder', {
+      asset_folder: assetFolder,
+      max_results: 500,
+      ...(cursor ? { next_cursor: cursor } : {}),
+    })
+    for (const r of page.resources ?? []) {
+      if ((r.resource_type ?? 'image') === 'image' && (r.type ?? 'upload') === 'upload') ids.push(r.public_id)
+    }
+    cursor = page.next_cursor
+  } while (cursor)
+  return ids
+}
+
+export function chunks(items, size) {
+  const out = []
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
+  return out
+}
+
+async function adminApi(env, method, path, params = {}) {
+  const url = new URL(`https://api.cloudinary.com/v1_1/${env.CLOUDINARY_CLOUD_NAME}/${path}`)
+  for (const [k, v] of Object.entries(params)) {
+    if (Array.isArray(v)) v.forEach(item => url.searchParams.append(`${k}[]`, item))
+    else url.searchParams.set(k, String(v))
+  }
+  const res = await fetch(url, {
+    method,
+    headers: { Authorization: `Basic ${btoa(`${env.CLOUDINARY_API_KEY}:${env.CLOUDINARY_API_SECRET}`)}` },
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new HttpError(502, `Cloudinary ${method} ${path} failed: ${data.error?.message ?? res.status}`)
+  return data
+}
+
+async function tagPhotos(env, command, tag, publicIds) {
+  const signed = { command, public_ids: publicIds, tag, timestamp: String(Math.floor(Date.now() / 1000)) }
+  const form = new FormData()
+  form.append('command', command)
+  form.append('tag', tag)
+  form.append('timestamp', signed.timestamp)
+  for (const id of publicIds) form.append('public_ids[]', id)
+  form.append('api_key', env.CLOUDINARY_API_KEY)
+  form.append('signature', await cloudinarySignature(signed, env.CLOUDINARY_API_SECRET))
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${env.CLOUDINARY_CLOUD_NAME}/image/tags`, {
+    method: 'POST',
+    body: form,
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new HttpError(502, `Cloudinary could not ${command} the ${tag} tag: ${data.error?.message ?? res.status}`)
   return data
 }
 

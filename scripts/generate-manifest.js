@@ -67,11 +67,11 @@ async function fromCloudinary(nameOverrides) {
   }
 
   // Fetch all resources using dynamic folder mode (asset_folder grouping)
-  const assets = [] // { folder, name, public_id, created_at }
+  const found = [] // { folder, name, public_id, created_at, tags }
   let nextCursor
   do {
     const res = await new Promise((resolve, reject) =>
-      cloudinary.api.resources({ max_results: 500, context: true, next_cursor: nextCursor }, (err, r) =>
+      cloudinary.api.resources({ max_results: 500, context: true, tags: true, next_cursor: nextCursor }, (err, r) =>
         err ? reject(err) : resolve(r)
       )
     )
@@ -84,7 +84,7 @@ async function fromCloudinary(nameOverrides) {
       // Strip the Cloudinary-appended suffix (_xxxxxx) to recover the original filename
       const name = r.display_name.replace(/_[a-z0-9]+$/i, '')
       const context = r.context?.custom ?? r.context ?? {}
-      assets.push({
+      found.push({
         folder,
         assetFolder,
         name,
@@ -92,10 +92,20 @@ async function fromCloudinary(nameOverrides) {
         created_at: r.created_at,
         taken: context.taken,
         product: context.product,
+        tags: r.tags ?? [],
       })
     }
     nextCursor = res.next_cursor
   } while (nextCursor)
+
+  // Hidden on the admin page (tags set by worker/src/index.js): a photo tagged
+  // "hidden", and every photo of a project where any photo is tagged
+  // "hidden-project". They stay in Cloudinary.
+  const hiddenFolders = new Set(found.filter(a => a.tags.includes('hidden-project')).map(a => a.folder))
+  const assets = found.filter(a => !a.tags.includes('hidden') && !hiddenFolders.has(a.folder))
+  if (assets.length < found.length) {
+    console.log(`Leaving out ${found.length - assets.length} hidden photos (${hiddenFolders.size} hidden projects)`)
+  }
 
   // Photo date: the one already on the site, else the Google Photos date saved
   // by the uploader, else the EXIF date from the per-asset details endpoint

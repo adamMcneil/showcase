@@ -9,6 +9,13 @@ on:
 permissions:
   contents: write
 
+# The admin page starts a run after every change. Runs wait for each other so
+# their commits don't race; a queued run reads Cloudinary when it starts, so
+# the newest one covers any it replaces.
+concurrency:
+  group: update-manifest
+  cancel-in-progress: false
+
 jobs:
   update-manifest:
     runs-on: ubuntu-latest

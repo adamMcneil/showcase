@@ -11,6 +11,7 @@ import {
   signIn,
   signOut,
 } from './googlePhotos'
+import Manage from './Manage'
 import { copyPhoto, publish } from './uploader'
 import '../App.css'
 import './Admin.css'
@@ -58,7 +59,13 @@ function plural(n, word) {
   return `${n} ${word}${n === 1 ? '' : 's'}`
 }
 
+// The tab is in the URL (#manage), so it can be bookmarked.
+function modeFromHash() {
+  return window.location.hash === '#manage' ? 'manage' : 'add'
+}
+
 export default function Admin() {
+  const [mode, setMode] = useState(modeFromHash)
   const [auth, setAuth] = useState(storedAuth)
   const [error, setError] = useState(null)
   const [projects, setProjects] = useState(null)
@@ -77,6 +84,15 @@ export default function Admin() {
     }
     setError(e.message)
   }
+
+  useEffect(() => {
+    function onHashChange() {
+      setError(null)
+      setMode(modeFromHash())
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
 
   useEffect(() => {
     if (!auth || projects) return
@@ -256,7 +272,7 @@ export default function Admin() {
       <div className="header">
         <a className="brand" href={SITE_URL}>
           <img className="brand-logo" src={`${SITE_URL}logo.svg`} alt="" width="40" height="40" />
-          <h1>Add photos</h1>
+          <h1>{mode === 'manage' ? 'Hide or remove' : 'Add photos'}</h1>
         </a>
         {auth && (
           <button className="link-button" onClick={handleSignOut}>
@@ -264,6 +280,17 @@ export default function Admin() {
           </button>
         )}
       </div>
+
+      {CONFIGURED && auth && (
+        <nav className="admin-tabs">
+          <a href="#add" aria-current={mode === 'add' ? 'page' : undefined}>
+            Add photos
+          </a>
+          <a href="#manage" aria-current={mode === 'manage' ? 'page' : undefined}>
+            Hide or remove
+          </a>
+        </nav>
+      )}
 
       {error && (
         <p className="admin-error" role="alert">
@@ -284,6 +311,8 @@ export default function Admin() {
             Sign in with Google
           </button>
         </section>
+      ) : mode === 'manage' ? (
+        <Manage token={auth.token} onError={fail} clearError={() => setError(null)} />
       ) : step === 'choose' ? (
         <ProjectChooser projects={projects} onChoose={chooseProject} />
       ) : step === 'pick' ? (

@@ -229,3 +229,181 @@ progress {
   color: #8a1f1f;
   font-weight: 700;
 }
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  margin: -8px 0 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-tabs a {
+  padding: 8px 12px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-tabs a[aria-current='page'] {
+  color: #111;
+  border-bottom-color: #2b2b2b;
+}
+
+/* ── Hide or remove ───────────────────────────────────────────────────────── */
+
+.danger {
+  display: inline-block;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #fff;
+  color: #a12626;
+  border: 1px solid #e3b4b4;
+}
+
+.primary:disabled,
+.secondary:disabled,
+.danger:disabled,
+.link-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.manage-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.panel .manage-status {
+  margin-bottom: 0;
+}
+
+.notice {
+  flex: 1 1 auto;
+  background: #e8f1e8;
+  border: 1px solid #c4dcc4;
+  color: #2f6b2f;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.badge-hidden {
+  margin-left: 8px;
+  background: #ececec;
+  color: #555;
+}
+
+.project-off .project-thumb {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.manage-grid {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}
+
+.manage-grid .photo {
+  position: relative;
+}
+
+/* Pinned to the square tile; height: 100% doesn't resolve against aspect-ratio. */
+.photo-button {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.photo-button:disabled {
+  cursor: default;
+}
+
+.photo-button:focus-visible {
+  outline: 3px solid #2b6cb0;
+  outline-offset: -3px;
+}
+
+.photo-hidden img {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.photo-flag {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.photo-selected .photo-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid #2b2b2b;
+  border-radius: 6px;
+}
+
+.photo-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #2b2b2b;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.selection-bar {
+  position: sticky;
+  bottom: 12px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.selection-bar > span {
+  flex: 1 1 auto;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.selection-bar .secondary,
+.selection-bar .danger {
+  padding: 8px 14px;
+}
