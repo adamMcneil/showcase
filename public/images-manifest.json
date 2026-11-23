@@ -44,6 +44,21 @@
     ]
   },
   {
+    "dir": "desk",
+    "assetFolder": "images/desk",
+    "added": "2026-10-17T17:29:43.443Z",
+    "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20261017_172943443_f608e239?_a=BAMAOGfk0",
+    "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261017_172943443_f608e239?_a=BAMAOGfk0",
+    "files": [
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261017_172943443_f608e239?_a=BAMAOGfk0",
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261017_200910758_355acb25?_a=BAMAOGfk0"
+    ],
+    "dates": [
+      "2026-10-17T17:29:43.443Z",
+      "2026-10-17T20:09:10.758Z"
+    ]
+  },
+  {
     "dir": "Mary Sign",
     "assetFolder": "images/mary-sign",
     "added": "2026-10-15T21:18:18",
