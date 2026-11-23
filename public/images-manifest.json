@@ -57,19 +57,6 @@
     ]
   },
   {
-    "dir": "test",
-    "assetFolder": "images/test",
-    "added": "2026-10-09T15:14:29.203Z",
-    "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20261009_151429203_9bd1abfc",
-    "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261009_151429203_9bd1abfc",
-    "files": [
-      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20261009_151429203_9bd1abfc"
-    ],
-    "dates": [
-      "2026-10-09T15:14:29.203Z"
-    ]
-  },
-  {
     "dir": "End Grain Cutting Board",
     "assetFolder": "images/end-grain-cutting-board",
     "added": "2026-09-26T20:43:08",
