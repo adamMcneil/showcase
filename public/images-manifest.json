@@ -118,6 +118,25 @@
     ]
   },
   {
+    "dir": "Katelyns Duck",
+    "assetFolder": "images/katelyns-duck",
+    "added": "2026-09-05T09:14:14",
+    "thumb": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto,w_600/PXL_20260905_141414884_ot7ryb",
+    "first": "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260905_141414884_ot7ryb",
+    "files": [
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260905_141414884_ot7ryb",
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260905_141422806_v0uiyv",
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260905_141431373_cxyjsm",
+      "https://res.cloudinary.com/drxedphcj/image/upload/f_auto,q_auto/PXL_20260905_141439194_q5vjn8"
+    ],
+    "dates": [
+      "2026-09-05T09:14:14",
+      "2026-09-05T09:14:22",
+      "2026-09-05T09:14:31",
+      "2026-09-05T09:14:39"
+    ]
+  },
+  {
     "dir": "Megs Bench White Oak",
     "assetFolder": "images/megs-bench-white-oak",
     "added": "2026-09-03T20:07:17",
